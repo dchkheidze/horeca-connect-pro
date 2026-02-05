@@ -1,14 +1,14 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
-export type AppRole = "restaurant" | "supplier" | "jobseeker";
+export type AppRole = "restaurant" | "supplier" | "jobseeker" | "admin";
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   role: AppRole | null;
+  isAdmin: boolean;
   loading: boolean;
   signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
@@ -21,19 +21,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchUserRole = async (userId: string) => {
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
-      .single();
+      .eq("user_id", userId);
     
-    if (data && !error) {
-      setRole(data.role as AppRole);
+    if (data && !error && data.length > 0) {
+      // Check if user has admin role
+      const hasAdmin = data.some((r) => r.role === "admin");
+      setIsAdmin(hasAdmin);
+      
+      // Set primary role (prefer non-admin role for dashboard routing)
+      const nonAdminRole = data.find((r) => r.role !== "admin");
+      setRole((nonAdminRole?.role || data[0].role) as AppRole);
     } else {
       setRole(null);
+      setIsAdmin(false);
     }
   };
 
@@ -137,10 +144,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setSession(null);
     setRole(null);
+    setIsAdmin(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, isAdmin, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
