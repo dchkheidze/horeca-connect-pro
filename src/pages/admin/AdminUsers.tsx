@@ -115,10 +115,26 @@ export default function AdminUsers() {
     setSaving(true);
 
     try {
-      // Get current roles
       const currentRoles = editingUser.roles;
       const rolesToAdd = selectedRoles.filter((r) => !currentRoles.includes(r));
       const rolesToRemove = currentRoles.filter((r) => !selectedRoles.includes(r));
+
+      // Check if trying to remove admin role
+      if (rolesToRemove.includes("admin")) {
+        // Count total admins in system
+        const { count, error: countError } = await supabase
+          .from("user_roles")
+          .select("id", { count: "exact", head: true })
+          .eq("role", "admin");
+
+        if (countError) throw countError;
+
+        if (count && count <= 1) {
+          toast.error("Cannot remove the last admin. Assign another admin first.");
+          setSaving(false);
+          return;
+        }
+      }
 
       // Remove roles
       for (const role of rolesToRemove) {
