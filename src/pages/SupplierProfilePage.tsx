@@ -1,29 +1,106 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { suppliers } from "@/data/mockData";
-import { 
-  MapPin, 
-  Star, 
-  Phone, 
-  Mail, 
-  Globe, 
-  ArrowLeft, 
-  CheckCircle2,
-  MessageSquare 
+import { supabase } from "@/integrations/supabase/client";
+import {
+  MapPin,
+  Phone,
+  Globe,
+  ArrowLeft,
+  Building2,
+  Package,
+  Loader2,
 } from "lucide-react";
+
+interface Supplier {
+  id: string;
+  slug: string;
+  name: string;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  website: string | null;
+  description: string | null;
+  categories: string[] | null;
+  coverage_areas: string[] | null;
+}
+
+interface SupplierOffer {
+  id: string;
+  title: string;
+  description: string | null;
+  type: string;
+  price_from: number | null;
+  currency: string | null;
+}
 
 export default function SupplierProfilePage() {
   const { slug } = useParams();
-  const supplier = suppliers.find((s) => s.slug === slug);
+  const [supplier, setSupplier] = useState<Supplier | null>(null);
+  const [offers, setOffers] = useState<SupplierOffer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSupplier = async () => {
+      if (!slug) return;
+
+      setLoading(true);
+
+      // Fetch supplier
+      const { data: supplierData, error: supplierError } = await supabase
+        .from("suppliers")
+        .select("*")
+        .eq("slug", slug)
+        .eq("is_published", true)
+        .maybeSingle();
+
+      if (supplierError) {
+        console.error("Error fetching supplier:", supplierError);
+        setLoading(false);
+        return;
+      }
+
+      if (supplierData) {
+        setSupplier(supplierData);
+
+        // Fetch offers for this supplier
+        const { data: offersData, error: offersError } = await supabase
+          .from("supplier_offers")
+          .select("id, title, description, type, price_from, currency")
+          .eq("supplier_id", supplierData.id)
+          .eq("is_active", true);
+
+        if (!offersError && offersData) {
+          setOffers(offersData);
+        }
+      }
+
+      setLoading(false);
+    };
+
+    fetchSupplier();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="container py-12 flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!supplier) {
     return (
       <div className="container py-12 text-center">
+        <Building2 className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
         <h1 className="text-2xl font-bold mb-4">Supplier not found</h1>
+        <p className="text-muted-foreground mb-6">
+          This supplier profile doesn't exist or isn't publicly visible.
+        </p>
         <Button asChild>
-          <Link to="/suppliers">Back to Suppliers</Link>
+          <Link to="/suppliers">Browse Suppliers</Link>
         </Button>
       </div>
     );
@@ -41,143 +118,166 @@ export default function SupplierProfilePage() {
           Back to Suppliers
         </Link>
 
-        {/* Hero */}
-        <div className="relative rounded-2xl overflow-hidden mb-8">
-          <div className="aspect-[3/1] lg:aspect-[4/1]">
-            <img
-              src={supplier.coverImage}
-              alt={supplier.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
-          
-          <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <img
-                  src={supplier.logo}
-                  alt={`${supplier.name} logo`}
-                  className="h-16 w-16 lg:h-20 lg:w-20 rounded-xl border-2 border-background object-cover"
-                />
-                <div>
-                  <h1 className="font-heading text-2xl lg:text-3xl font-bold text-background">
-                    {supplier.name}
-                  </h1>
-                  <div className="flex items-center gap-4 mt-1 text-background/80">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      {supplier.location}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Star className="h-4 w-4 text-accent fill-accent" />
-                      {supplier.rating} ({supplier.reviewCount} reviews)
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <Button size="lg" variant="accent">
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Contact Supplier
-              </Button>
-            </div>
-          </div>
-        </div>
-
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Header Card */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="h-16 w-16 rounded-xl bg-primary/10 flex items-center justify-center border border-border">
+                    <Building2 className="h-8 w-8 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h1 className="font-heading text-2xl font-bold">{supplier.name}</h1>
+                    <p className="text-muted-foreground">
+                      {supplier.categories?.[0] || "Supplier"}
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground">
+                      {supplier.city && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          {supplier.city}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* About */}
             <Card>
               <CardHeader>
                 <CardTitle>About</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  {supplier.description}
+                  {supplier.description || "No description available."}
                 </p>
-
-                <div className="flex flex-wrap gap-2 mt-6">
-                  {supplier.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Services</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {supplier.services.map((service) => (
-                    <div key={service} className="flex items-center gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span>{service}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Categories */}
+            {supplier.categories && supplier.categories.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Categories</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {supplier.categories.map((category) => (
+                      <Badge key={category} variant="secondary">
+                        {category}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Coverage Areas */}
+            {supplier.coverage_areas && supplier.coverage_areas.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Coverage Areas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {supplier.coverage_areas.map((area) => (
+                      <Badge key={area} variant="outline">
+                        {area}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Offers */}
+            {offers.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    Products & Services
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {offers.map((offer) => (
+                      <div
+                        key={offer.id}
+                        className="p-4 rounded-lg border border-border bg-card"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-semibold">{offer.title}</h4>
+                          <Badge variant="outline" className="text-xs">
+                            {offer.type}
+                          </Badge>
+                        </div>
+                        {offer.description && (
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {offer.description}
+                          </p>
+                        )}
+                        {offer.price_from && (
+                          <p className="text-sm font-medium">
+                            From {offer.currency || "EUR"} {offer.price_from}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <a
-                  href={`mailto:${supplier.contact.email}`}
-                  className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Mail className="h-5 w-5" />
-                  <span>{supplier.contact.email}</span>
-                </a>
-                <a
-                  href={`tel:${supplier.contact.phone}`}
-                  className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Phone className="h-5 w-5" />
-                  <span>{supplier.contact.phone}</span>
-                </a>
-                <a
-                  href={`https://${supplier.contact.website}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Globe className="h-5 w-5" />
-                  <span>{supplier.contact.website}</span>
-                </a>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Category</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Badge variant="outline" className="text-sm">
-                  {supplier.category}
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card className="hero-gradient text-primary-foreground">
-              <CardContent className="p-6 text-center">
-                <h3 className="font-heading font-semibold text-lg mb-2">
-                  Interested in this supplier?
-                </h3>
-                <p className="text-sm text-primary-foreground/80 mb-4">
-                  Sign up to send inquiries and request quotes.
+            <Card className="sticky top-24">
+              <CardContent className="p-6">
+                <h3 className="font-heading font-semibold text-lg mb-4">Contact Supplier</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Get in touch to discuss your requirements and receive a quote.
                 </p>
-                <Button variant="accent" className="w-full" asChild>
-                  <Link to="/auth/register?role=restaurant">Create Account</Link>
+
+                <div className="space-y-3 mb-6">
+                  {supplier.phone && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{supplier.phone}</span>
+                    </div>
+                  )}
+                  {supplier.website && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <a
+                        href={
+                          supplier.website.startsWith("http")
+                            ? supplier.website
+                            : `https://${supplier.website}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        {supplier.website}
+                      </a>
+                    </div>
+                  )}
+                  {supplier.address && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span>{supplier.address}</span>
+                    </div>
+                  )}
+                </div>
+
+                <Button className="w-full" asChild>
+                  <Link to="/auth/register?role=restaurant">Request Quote</Link>
                 </Button>
               </CardContent>
             </Card>

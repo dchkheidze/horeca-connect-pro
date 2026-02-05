@@ -47,22 +47,22 @@ export default function OnboardingPage() {
         const { data } = await supabase
           .from("restaurants")
           .select("id")
-          .eq("user_id", user.id)
-          .single();
+          .eq("owner_user_id", user.id)
+          .maybeSingle();
         exists = !!data;
       } else if (role === "supplier") {
         const { data } = await supabase
-          .from("supplier_profiles")
+          .from("suppliers")
           .select("id")
-          .eq("user_id", user.id)
-          .single();
+          .eq("owner_user_id", user.id)
+          .maybeSingle();
         exists = !!data;
       } else if (role === "jobseeker") {
         const { data } = await supabase
-          .from("candidates")
+          .from("job_seekers")
           .select("id")
           .eq("user_id", user.id)
-          .single();
+          .maybeSingle();
         exists = !!data;
       }
 
