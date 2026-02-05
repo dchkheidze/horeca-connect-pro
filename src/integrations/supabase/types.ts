@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      candidates: {
+        Row: {
+          about: string | null
+          city: string | null
+          created_at: string
+          full_name: string
+          headline: string | null
+          id: string
+          job_categories: string[] | null
+          phone: string | null
+          schedule_types: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          about?: string | null
+          city?: string | null
+          created_at?: string
+          full_name: string
+          headline?: string | null
+          id?: string
+          job_categories?: string[] | null
+          phone?: string | null
+          schedule_types?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          about?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string
+          headline?: string | null
+          id?: string
+          job_categories?: string[] | null
+          phone?: string | null
+          schedule_types?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -35,6 +77,128 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      restaurants: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          cuisine_tags: string[] | null
+          description: string | null
+          id: string
+          name: string
+          phone: string | null
+          price_level: number | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          cuisine_tags?: string[] | null
+          description?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          price_level?: number | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          cuisine_tags?: string[] | null
+          description?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          price_level?: number | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      supplier_offers: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          supplier_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          supplier_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          supplier_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_offers_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_profiles: {
+        Row: {
+          address: string | null
+          categories: string[] | null
+          city: string | null
+          company_name: string
+          coverage_areas: string[] | null
+          created_at: string
+          description: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          categories?: string[] | null
+          city?: string | null
+          company_name: string
+          coverage_areas?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          categories?: string[] | null
+          city?: string | null
+          company_name?: string
+          coverage_areas?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
         }
         Relationships: []
       }

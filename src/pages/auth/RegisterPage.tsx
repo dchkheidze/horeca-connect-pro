@@ -83,16 +83,11 @@ export default function RegisterPage() {
 
     toast({
       title: "Account created!",
-      description: "Welcome to HoReCa Hub. Redirecting to your dashboard...",
+      description: "Welcome to HoReCa Hub. Let's set up your profile...",
     });
 
-    // Redirect based on role
-    const roleRedirects: Record<AppRole, string> = {
-      restaurant: "/r/dashboard",
-      supplier: "/s/dashboard",
-      jobseeker: "/j/dashboard",
-    };
-    navigate(roleRedirects[formData.role as AppRole]);
+    // Redirect to onboarding
+    navigate("/onboarding");
   };
 
   return (
