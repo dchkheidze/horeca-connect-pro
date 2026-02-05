@@ -91,15 +91,16 @@ export function JobSeekerOnboarding({ userId, fullName = "", onComplete }: JobSe
   const handleComplete = async () => {
     setLoading(true);
 
-    const { error } = await supabase.from("candidates").insert({
+    const { error } = await supabase.from("job_seekers").insert({
       user_id: userId,
       full_name: formData.fullName,
       phone: formData.phone || null,
       city: formData.city || null,
-      headline: formData.headline || null,
+      title: formData.headline || null,
       about: formData.about || null,
       job_categories: formData.jobCategories,
       schedule_types: formData.scheduleTypes,
+      visibility_status: "PRIVATE" as const,
     });
 
     setLoading(false);

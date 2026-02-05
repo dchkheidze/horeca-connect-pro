@@ -120,12 +120,19 @@ export function SupplierOnboarding({ userId, onComplete }: SupplierOnboardingPro
   const handleComplete = async () => {
     setLoading(true);
 
+    // Generate slug from company name
+    const slug = formData.companyName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") + "-" + Date.now().toString(36);
+
     // Create supplier profile
     const { data: supplierData, error: supplierError } = await supabase
-      .from("supplier_profiles")
+      .from("suppliers")
       .insert({
-        user_id: userId,
-        company_name: formData.companyName,
+        owner_user_id: userId,
+        name: formData.companyName,
+        slug: slug,
         city: formData.city || null,
         address: formData.address || null,
         phone: formData.phone || null,
@@ -133,6 +140,7 @@ export function SupplierOnboarding({ userId, onComplete }: SupplierOnboardingPro
         description: formData.description || null,
         categories: formData.categories,
         coverage_areas: formData.coverageAreas,
+        is_published: false,
       })
       .select()
       .single();
@@ -151,6 +159,8 @@ export function SupplierOnboarding({ userId, onComplete }: SupplierOnboardingPro
           supplier_id: supplierData.id,
           title: offer.title,
           description: offer.description || null,
+          type: "PRODUCT" as const,
+          is_active: true,
         }))
       );
 

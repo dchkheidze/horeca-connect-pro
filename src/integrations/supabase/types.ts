@@ -14,47 +14,147 @@ export type Database = {
   }
   public: {
     Tables: {
-      candidates: {
+      job_applications: {
+        Row: {
+          cover_letter: string | null
+          created_at: string
+          id: string
+          job_id: string
+          status: Database["public"]["Enums"]["application_status"] | null
+          user_id: string
+        }
+        Insert: {
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          job_id: string
+          status?: Database["public"]["Enums"]["application_status"] | null
+          user_id: string
+        }
+        Update: {
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string
+          status?: Database["public"]["Enums"]["application_status"] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_seekers: {
         Row: {
           about: string | null
           city: string | null
           created_at: string
           full_name: string
-          headline: string | null
           id: string
           job_categories: string[] | null
           phone: string | null
           schedule_types: string[] | null
+          title: string | null
           updated_at: string
           user_id: string
+          visibility_status:
+            | Database["public"]["Enums"]["visibility_status"]
+            | null
         }
         Insert: {
           about?: string | null
           city?: string | null
           created_at?: string
           full_name: string
-          headline?: string | null
           id?: string
           job_categories?: string[] | null
           phone?: string | null
           schedule_types?: string[] | null
+          title?: string | null
           updated_at?: string
           user_id: string
+          visibility_status?:
+            | Database["public"]["Enums"]["visibility_status"]
+            | null
         }
         Update: {
           about?: string | null
           city?: string | null
           created_at?: string
           full_name?: string
-          headline?: string | null
           id?: string
           job_categories?: string[] | null
           phone?: string | null
           schedule_types?: string[] | null
+          title?: string | null
           updated_at?: string
           user_id?: string
+          visibility_status?:
+            | Database["public"]["Enums"]["visibility_status"]
+            | null
         }
         Relationships: []
+      }
+      jobs: {
+        Row: {
+          city: string | null
+          created_at: string
+          currency: string | null
+          description: string | null
+          employment_type: string | null
+          id: string
+          published_at: string | null
+          restaurant_id: string
+          salary_max: number | null
+          salary_min: number | null
+          slug: string
+          status: Database["public"]["Enums"]["job_status"] | null
+          title: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          employment_type?: string | null
+          id?: string
+          published_at?: string | null
+          restaurant_id: string
+          salary_max?: number | null
+          salary_min?: number | null
+          slug: string
+          status?: Database["public"]["Enums"]["job_status"] | null
+          title: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          employment_type?: string | null
+          id?: string
+          published_at?: string | null
+          restaurant_id?: string
+          salary_max?: number | null
+          salary_min?: number | null
+          slug?: string
+          status?: Database["public"]["Enums"]["job_status"] | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -88,11 +188,13 @@ export type Database = {
           cuisine_tags: string[] | null
           description: string | null
           id: string
+          is_published: boolean | null
           name: string
+          owner_user_id: string
           phone: string | null
           price_level: number | null
+          slug: string | null
           updated_at: string
-          user_id: string
           website: string | null
         }
         Insert: {
@@ -102,11 +204,13 @@ export type Database = {
           cuisine_tags?: string[] | null
           description?: string | null
           id?: string
+          is_published?: boolean | null
           name: string
+          owner_user_id: string
           phone?: string | null
           price_level?: number | null
+          slug?: string | null
           updated_at?: string
-          user_id: string
           website?: string | null
         }
         Update: {
@@ -116,11 +220,13 @@ export type Database = {
           cuisine_tags?: string[] | null
           description?: string | null
           id?: string
+          is_published?: boolean | null
           name?: string
+          owner_user_id?: string
           phone?: string | null
           price_level?: number | null
+          slug?: string | null
           updated_at?: string
-          user_id?: string
           website?: string | null
         }
         Relationships: []
@@ -128,76 +234,94 @@ export type Database = {
       supplier_offers: {
         Row: {
           created_at: string
+          currency: string | null
           description: string | null
           id: string
+          is_active: boolean | null
+          price_from: number | null
           supplier_id: string
           title: string
+          type: Database["public"]["Enums"]["offer_type"] | null
         }
         Insert: {
           created_at?: string
+          currency?: string | null
           description?: string | null
           id?: string
+          is_active?: boolean | null
+          price_from?: number | null
           supplier_id: string
           title: string
+          type?: Database["public"]["Enums"]["offer_type"] | null
         }
         Update: {
           created_at?: string
+          currency?: string | null
           description?: string | null
           id?: string
+          is_active?: boolean | null
+          price_from?: number | null
           supplier_id?: string
           title?: string
+          type?: Database["public"]["Enums"]["offer_type"] | null
         }
         Relationships: [
           {
             foreignKeyName: "supplier_offers_supplier_id_fkey"
             columns: ["supplier_id"]
             isOneToOne: false
-            referencedRelation: "supplier_profiles"
+            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
         ]
       }
-      supplier_profiles: {
+      suppliers: {
         Row: {
           address: string | null
           categories: string[] | null
           city: string | null
-          company_name: string
           coverage_areas: string[] | null
           created_at: string
           description: string | null
           id: string
+          is_published: boolean | null
+          name: string
+          owner_user_id: string
           phone: string | null
+          slug: string | null
           updated_at: string
-          user_id: string
           website: string | null
         }
         Insert: {
           address?: string | null
           categories?: string[] | null
           city?: string | null
-          company_name: string
           coverage_areas?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
+          is_published?: boolean | null
+          name: string
+          owner_user_id: string
           phone?: string | null
+          slug?: string | null
           updated_at?: string
-          user_id: string
           website?: string | null
         }
         Update: {
           address?: string | null
           categories?: string[] | null
           city?: string | null
-          company_name?: string
           coverage_areas?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
+          is_published?: boolean | null
+          name?: string
+          owner_user_id?: string
           phone?: string | null
+          slug?: string | null
           updated_at?: string
-          user_id?: string
           website?: string | null
         }
         Relationships: []
@@ -242,6 +366,16 @@ export type Database = {
     }
     Enums: {
       app_role: "restaurant" | "supplier" | "jobseeker"
+      application_status:
+        | "APPLIED"
+        | "SHORTLISTED"
+        | "INTERVIEW"
+        | "OFFERED"
+        | "REJECTED"
+        | "HIRED"
+      job_status: "DRAFT" | "PUBLISHED" | "CLOSED"
+      offer_type: "PRODUCT" | "SERVICE"
+      visibility_status: "PRIVATE" | "PUBLIC"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -370,6 +504,17 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["restaurant", "supplier", "jobseeker"],
+      application_status: [
+        "APPLIED",
+        "SHORTLISTED",
+        "INTERVIEW",
+        "OFFERED",
+        "REJECTED",
+        "HIRED",
+      ],
+      job_status: ["DRAFT", "PUBLISHED", "CLOSED"],
+      offer_type: ["PRODUCT", "SERVICE"],
+      visibility_status: ["PRIVATE", "PUBLIC"],
     },
   },
 } as const

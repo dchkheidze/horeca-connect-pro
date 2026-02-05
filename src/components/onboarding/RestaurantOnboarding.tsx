@@ -88,9 +88,16 @@ export function RestaurantOnboarding({ userId, onComplete }: RestaurantOnboardin
   const handleComplete = async () => {
     setLoading(true);
 
+    // Generate slug from restaurant name
+    const slug = formData.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") + "-" + Date.now().toString(36);
+
     const { error } = await supabase.from("restaurants").insert({
-      user_id: userId,
+      owner_user_id: userId,
       name: formData.name,
+      slug: slug,
       city: formData.city || null,
       address: formData.address || null,
       phone: formData.phone || null,
@@ -98,6 +105,7 @@ export function RestaurantOnboarding({ userId, onComplete }: RestaurantOnboardin
       description: formData.description || null,
       cuisine_tags: formData.cuisineTags,
       price_level: formData.priceLevel,
+      is_published: false,
     });
 
     setLoading(false);
