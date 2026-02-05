@@ -19,13 +19,14 @@ interface DashboardLayoutProps {
 
 const roleConfig = {
   restaurant: {
-    title: "Restaurant Dashboard",
+    title: "Restaurant Portal",
     prefix: "/r",
     color: "bg-primary",
     navItems: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/r/dashboard" },
+      { icon: Briefcase, label: "Jobs", href: "/r/hr/jobs" },
+      { icon: Users, label: "Applications", href: "/r/hr/applications" },
       { icon: Building2, label: "Suppliers", href: "/r/suppliers" },
-      { icon: Briefcase, label: "Jobs", href: "/r/jobs" },
       { icon: Settings, label: "Settings", href: "/r/settings" },
     ],
   },
@@ -41,7 +42,7 @@ const roleConfig = {
     ],
   },
   jobseeker: {
-    title: "Job Seeker Dashboard",
+    title: "Job Seeker Portal",
     prefix: "/j",
     color: "bg-jobseeker",
     navItems: [
