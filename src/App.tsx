@@ -27,10 +27,14 @@ import DashboardRedirect from "@/pages/DashboardRedirect";
 
 // Dashboard Pages
 import RestaurantDashboard from "@/pages/dashboards/RestaurantDashboard";
+import RestaurantJobs from "@/pages/restaurant/RestaurantJobs";
+import RestaurantApplications from "@/pages/restaurant/RestaurantApplications";
 import SupplierDashboard from "@/pages/dashboards/SupplierDashboard";
 import SupplierProfileEdit from "@/pages/supplier/SupplierProfileEdit";
 import SupplierOffers from "@/pages/supplier/SupplierOffers";
 import JobSeekerDashboard from "@/pages/dashboards/JobSeekerDashboard";
+import JobSeekerProfile from "@/pages/jobseeker/JobSeekerProfile";
+import JobSeekerApplications from "@/pages/jobseeker/JobSeekerApplications";
 
 import NotFound from "@/pages/NotFound";
 
@@ -69,8 +73,9 @@ const App = () => (
               }
             >
               <Route path="dashboard" element={<RestaurantDashboard />} />
+              <Route path="hr/jobs" element={<RestaurantJobs />} />
+              <Route path="hr/applications" element={<RestaurantApplications />} />
               <Route path="suppliers" element={<div className="p-4">Supplier Management - Coming Soon</div>} />
-              <Route path="jobs" element={<div className="p-4">Job Postings - Coming Soon</div>} />
               <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
             </Route>
 
@@ -99,8 +104,8 @@ const App = () => (
               }
             >
               <Route path="dashboard" element={<JobSeekerDashboard />} />
-              <Route path="applications" element={<div className="p-4">Applications - Coming Soon</div>} />
-              <Route path="profile" element={<div className="p-4">Profile - Coming Soon</div>} />
+              <Route path="applications" element={<JobSeekerApplications />} />
+              <Route path="profile" element={<JobSeekerProfile />} />
               <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
             </Route>
 

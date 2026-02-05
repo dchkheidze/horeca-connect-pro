@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, MapPin, Clock, Banknote, ArrowRight, Briefcase, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -25,11 +32,13 @@ interface Job {
   } | null;
 }
 
-const jobTypeFilters = ["All Types", "Full-time", "Part-time", "Contract", "Seasonal"];
+const employmentTypes = ["All Types", "Full-time", "Part-time", "Contract", "Seasonal"];
 
 export default function JobsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("All Types");
+  const [selectedCity, setSelectedCity] = useState("All Cities");
+  const [cities, setCities] = useState<string[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,6 +68,9 @@ export default function JobsPage() {
         console.error("Error fetching jobs:", error);
       } else {
         setJobs(data || []);
+        // Extract unique cities
+        const uniqueCities = [...new Set(data?.map((j) => j.city).filter(Boolean) as string[])];
+        setCities(uniqueCities.sort());
       }
       setLoading(false);
     };
@@ -74,7 +86,8 @@ export default function JobsPage() {
     const matchesType =
       selectedType === "All Types" ||
       job.employment_type?.toLowerCase() === selectedType.toLowerCase();
-    return matchesSearch && matchesType;
+    const matchesCity = selectedCity === "All Cities" || job.city === selectedCity;
+    return matchesSearch && matchesType && matchesCity;
   });
 
   const formatSalary = (min: number | null, max: number | null, currency: string | null) => {
@@ -104,15 +117,30 @@ export default function JobsPage() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search jobs..."
+              placeholder="Search by title, company, or keyword..."
               className="pl-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
+          <Select value={selectedCity} onValueChange={setSelectedCity}>
+            <SelectTrigger className="w-[180px]">
+              <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+              <SelectValue placeholder="City" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All Cities">All Cities</SelectItem>
+              {cities.map((city) => (
+                <SelectItem key={city} value={city}>
+                  {city}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <div className="flex flex-wrap gap-2">
-            {jobTypeFilters.map((type) => (
+            {employmentTypes.map((type) => (
               <Button
                 key={type}
                 variant={selectedType === type ? "default" : "outline"}
@@ -214,6 +242,7 @@ export default function JobsPage() {
                 onClick={() => {
                   setSearchQuery("");
                   setSelectedType("All Types");
+                  setSelectedCity("All Cities");
                 }}
               >
                 Clear filters

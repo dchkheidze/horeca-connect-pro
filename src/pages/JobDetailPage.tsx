@@ -1,9 +1,21 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import {
   MapPin,
   Clock,
@@ -12,6 +24,7 @@ import {
   Briefcase,
   Building2,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -36,8 +49,17 @@ interface Job {
 
 export default function JobDetailPage() {
   const { slug } = useParams();
+  const navigate = useNavigate();
+  const { user, role } = useAuth();
+  const { toast } = useToast();
+
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasApplied, setHasApplied] = useState(false);
+  const [hasProfile, setHasProfile] = useState(false);
+  const [applyDialogOpen, setApplyDialogOpen] = useState(false);
+  const [coverLetter, setCoverLetter] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -74,6 +96,94 @@ export default function JobDetailPage() {
 
     fetchJob();
   }, [slug]);
+
+  // Check if user already applied and has profile
+  useEffect(() => {
+    const checkApplicationStatus = async () => {
+      if (!user || !job) return;
+
+      // Check for existing application
+      const { data: application } = await supabase
+        .from("job_applications")
+        .select("id")
+        .eq("job_id", job.id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      setHasApplied(!!application);
+
+      // Check for job seeker profile
+      const { data: profile } = await supabase
+        .from("job_seekers")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      setHasProfile(!!profile);
+    };
+
+    checkApplicationStatus();
+  }, [user, job]);
+
+  const handleApplyClick = () => {
+    if (!user) {
+      navigate("/auth/login", { state: { from: `/jobs/${slug}` } });
+      return;
+    }
+
+    if (role !== "jobseeker") {
+      toast({
+        title: "Cannot apply",
+        description: "Only job seekers can apply for jobs.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!hasProfile) {
+      toast({
+        title: "Profile required",
+        description: "Please complete your profile before applying.",
+      });
+      navigate("/onboarding");
+      return;
+    }
+
+    setApplyDialogOpen(true);
+  };
+
+  const handleSubmitApplication = async () => {
+    if (!job || !user) return;
+
+    setSubmitting(true);
+
+    const { error } = await supabase.from("job_applications").insert({
+      job_id: job.id,
+      user_id: user.id,
+      cover_letter: coverLetter.trim() || null,
+      status: "APPLIED",
+    });
+
+    setSubmitting(false);
+
+    if (error) {
+      console.error("Error submitting application:", error);
+      toast({
+        title: "Error",
+        description: error.message.includes("duplicate")
+          ? "You have already applied for this job."
+          : "Failed to submit application. Please try again.",
+        variant: "destructive",
+      });
+    } else {
+      setHasApplied(true);
+      setApplyDialogOpen(false);
+      toast({
+        title: "Application submitted!",
+        description: "Your application has been sent to the employer.",
+      });
+    }
+  };
 
   const formatSalary = (min: number | null, max: number | null, currency: string | null) => {
     if (!min && !max) return "Salary negotiable";
@@ -189,19 +299,42 @@ export default function JobDetailPage() {
           <div className="space-y-6">
             <Card className="sticky top-24">
               <CardContent className="p-6">
-                <h3 className="font-heading font-semibold text-lg mb-4">
-                  Apply for this position
-                </h3>
-                <p className="text-sm text-muted-foreground mb-6">
-                  Create a profile to apply for this job and get notified about similar
-                  opportunities.
-                </p>
-                <Button className="w-full mb-3" size="lg" asChild>
-                  <Link to="/auth/register?role=jobseeker">Apply Now</Link>
-                </Button>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link to="/auth/login">Sign in to Apply</Link>
-                </Button>
+                {hasApplied ? (
+                  <div className="text-center">
+                    <CheckCircle2 className="h-12 w-12 mx-auto text-green-600 mb-3" />
+                    <h3 className="font-heading font-semibold text-lg mb-2">
+                      Application Submitted
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      You've already applied for this position. The employer will review your
+                      application.
+                    </p>
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link to="/j/applications">View My Applications</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="font-heading font-semibold text-lg mb-4">
+                      Apply for this position
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-6">
+                      {user && role === "jobseeker"
+                        ? "Submit your application with an optional cover letter."
+                        : "Create a profile to apply for this job and get notified about similar opportunities."}
+                    </p>
+                    <Button className="w-full mb-3" size="lg" onClick={handleApplyClick}>
+                      Apply Now
+                    </Button>
+                    {!user && (
+                      <Button variant="outline" className="w-full" asChild>
+                        <Link to="/auth/login" state={{ from: `/jobs/${slug}` }}>
+                          Sign in to Apply
+                        </Link>
+                      </Button>
+                    )}
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -227,6 +360,39 @@ export default function JobDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Apply Dialog */}
+      <Dialog open={applyDialogOpen} onOpenChange={setApplyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Apply for {job.title}</DialogTitle>
+            <DialogDescription>
+              at {job.restaurant?.name || "Company"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="coverLetter">Cover Letter (optional)</Label>
+              <Textarea
+                id="coverLetter"
+                value={coverLetter}
+                onChange={(e) => setCoverLetter(e.target.value)}
+                placeholder="Tell the employer why you're a great fit for this role..."
+                rows={6}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setApplyDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmitApplication} disabled={submitting}>
+              {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Submit Application
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
