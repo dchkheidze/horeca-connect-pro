@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, 
@@ -7,10 +7,10 @@ import {
   Briefcase, 
   Settings, 
   LogOut,
-  Menu,
-  X 
+  Menu
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardLayoutProps {
   role: "restaurant" | "supplier" | "jobseeker";
@@ -54,8 +54,15 @@ const roleConfig = {
 
 export function DashboardLayout({ role }: DashboardLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const config = roleConfig[role];
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { signOut, user } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -94,11 +101,16 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
-          <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground" asChild>
-            <Link to="/">
-              <LogOut className="h-5 w-5" />
-              Sign out
-            </Link>
+          <div className="mb-3 px-3 text-xs text-muted-foreground truncate">
+            {user?.email}
+          </div>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-3 text-muted-foreground"
+            onClick={handleSignOut}
+          >
+            <LogOut className="h-5 w-5" />
+            Sign out
           </Button>
         </div>
       </aside>
