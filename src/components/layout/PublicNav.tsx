@@ -13,16 +13,17 @@ const navLinks = [
 export function PublicNav() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, role, signOut } = useAuth();
+  const { user, role, isAdmin, signOut } = useAuth();
 
   const getDashboardLink = () => {
     if (!role) return "/dashboard";
-    const roleLinks = {
+    if (role === "admin") return "/admin/dashboard";
+    const roleLinks: Record<string, string> = {
       restaurant: "/r/dashboard",
       supplier: "/s/dashboard",
       jobseeker: "/j/dashboard",
     };
-    return roleLinks[role];
+    return roleLinks[role] || "/dashboard";
   };
 
   const handleSignOut = async () => {
@@ -60,6 +61,11 @@ export function PublicNav() {
         <div className="hidden items-center gap-3 md:flex">
           {user ? (
             <>
+              {isAdmin && (
+                <Button variant="ghost" asChild className="text-destructive">
+                  <Link to="/admin/dashboard">Admin</Link>
+                </Button>
+              )}
               <Button variant="ghost" asChild>
                 <Link to={getDashboardLink()}>Dashboard</Link>
               </Button>
@@ -109,6 +115,15 @@ export function PublicNav() {
             <hr className="my-2 border-border" />
             {user ? (
               <>
+                {isAdmin && (
+                  <Link
+                    to="/admin/dashboard"
+                    className="px-4 py-3 text-sm font-medium text-destructive hover:bg-secondary rounded-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Admin Panel
+                  </Link>
+                )}
                 <Link
                   to={getDashboardLink()}
                   className="px-4 py-3 text-sm font-medium hover:bg-secondary rounded-lg"

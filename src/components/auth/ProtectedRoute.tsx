@@ -23,14 +23,17 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && role && !allowedRoles.includes(role)) {
+  // Get the non-admin role for comparison
+  const userRole = role === "admin" ? null : role;
+
+  if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
     // User doesn't have the required role, redirect to their dashboard
-    const roleRedirects = {
+    const roleRedirects: Record<string, string> = {
       restaurant: "/r/dashboard",
       supplier: "/s/dashboard",
       jobseeker: "/j/dashboard",
     };
-    return <Navigate to={roleRedirects[role]} replace />;
+    return <Navigate to={roleRedirects[userRole] || "/dashboard"} replace />;
   }
 
   return <>{children}</>;

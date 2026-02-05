@@ -7,10 +7,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 // Auth
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminRoute } from "@/components/auth/AdminRoute";
 
 // Layouts
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 
 // Public Pages
 import LandingPage from "@/pages/LandingPage";
@@ -35,6 +37,13 @@ import SupplierOffers from "@/pages/supplier/SupplierOffers";
 import JobSeekerDashboard from "@/pages/dashboards/JobSeekerDashboard";
 import JobSeekerProfile from "@/pages/jobseeker/JobSeekerProfile";
 import JobSeekerApplications from "@/pages/jobseeker/JobSeekerApplications";
+
+// Admin Pages
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminModeration from "@/pages/admin/AdminModeration";
+import AdminContent from "@/pages/admin/AdminContent";
+import AdminCategories from "@/pages/admin/AdminCategories";
 
 import NotFound from "@/pages/NotFound";
 
@@ -107,6 +116,22 @@ const App = () => (
               <Route path="applications" element={<JobSeekerApplications />} />
               <Route path="profile" element={<JobSeekerProfile />} />
               <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
+            </Route>
+
+            {/* Admin routes (protected - admin only) */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminLayout />
+                </AdminRoute>
+              }
+            >
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="moderation" element={<AdminModeration />} />
+              <Route path="content" element={<AdminContent />} />
+              <Route path="categories" element={<AdminCategories />} />
             </Route>
 
             {/* Catch-all */}

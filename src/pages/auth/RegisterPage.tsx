@@ -17,7 +17,7 @@ const registerSchema = z.object({
   role: z.enum(["restaurant", "supplier", "jobseeker"], { required_error: "Please select an account type" }),
 });
 
-const roleLabels: Record<AppRole, string> = {
+const roleLabels: Record<Exclude<AppRole, "admin">, string> = {
   restaurant: "Restaurant representative",
   supplier: "Supplier representative",
   jobseeker: "Job seeker",
