@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function DashboardRedirect() {
   const navigate = useNavigate();
   const { user, role, loading } = useAuth();
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     if (loading) return;
@@ -14,14 +16,51 @@ export default function DashboardRedirect() {
       return;
     }
 
-    if (role) {
+    if (!role) return;
+
+    // Check if profile exists for this role
+    const checkProfileAndRedirect = async () => {
+      let profileExists = false;
+
+      if (role === "restaurant") {
+        const { data } = await supabase
+          .from("restaurants")
+          .select("id")
+          .eq("user_id", user.id)
+          .single();
+        profileExists = !!data;
+      } else if (role === "supplier") {
+        const { data } = await supabase
+          .from("supplier_profiles")
+          .select("id")
+          .eq("user_id", user.id)
+          .single();
+        profileExists = !!data;
+      } else if (role === "jobseeker") {
+        const { data } = await supabase
+          .from("candidates")
+          .select("id")
+          .eq("user_id", user.id)
+          .single();
+        profileExists = !!data;
+      }
+
+      if (!profileExists) {
+        // Redirect to onboarding
+        navigate("/onboarding", { replace: true });
+        return;
+      }
+
+      // Redirect to appropriate dashboard
       const roleRedirects = {
         restaurant: "/r/dashboard",
         supplier: "/s/dashboard",
         jobseeker: "/j/dashboard",
       };
       navigate(roleRedirects[role], { replace: true });
-    }
+    };
+
+    checkProfileAndRedirect();
   }, [user, role, loading, navigate]);
 
   return (
