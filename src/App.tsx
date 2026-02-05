@@ -28,6 +28,8 @@ import DashboardRedirect from "@/pages/DashboardRedirect";
 // Dashboard Pages
 import RestaurantDashboard from "@/pages/dashboards/RestaurantDashboard";
 import SupplierDashboard from "@/pages/dashboards/SupplierDashboard";
+import SupplierProfileEdit from "@/pages/supplier/SupplierProfileEdit";
+import SupplierOffers from "@/pages/supplier/SupplierOffers";
 import JobSeekerDashboard from "@/pages/dashboards/JobSeekerDashboard";
 
 import NotFound from "@/pages/NotFound";
@@ -82,8 +84,8 @@ const App = () => (
               }
             >
               <Route path="dashboard" element={<SupplierDashboard />} />
-              <Route path="leads" element={<div className="p-4">Leads Management - Coming Soon</div>} />
-              <Route path="profile" element={<div className="p-4">Profile Editor - Coming Soon</div>} />
+              <Route path="profile" element={<SupplierProfileEdit />} />
+              <Route path="offers" element={<SupplierOffers />} />
               <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
             </Route>
 

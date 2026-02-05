@@ -7,7 +7,8 @@ import {
   Briefcase, 
   Settings, 
   LogOut,
-  Menu
+  Menu,
+  Package
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,13 +30,13 @@ const roleConfig = {
     ],
   },
   supplier: {
-    title: "Supplier Dashboard",
+    title: "Supplier Portal",
     prefix: "/s",
     color: "bg-supplier",
     navItems: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/s/dashboard" },
-      { icon: Users, label: "Leads", href: "/s/leads" },
       { icon: Building2, label: "Profile", href: "/s/profile" },
+      { icon: Package, label: "Offers", href: "/s/offers" },
       { icon: Settings, label: "Settings", href: "/s/settings" },
     ],
   },
