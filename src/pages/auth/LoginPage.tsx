@@ -1,27 +1,79 @@
 import { useState } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Mail, Lock } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().trim().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const { signIn, role } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+
+  // Get the redirect path from state, or default to dashboard
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+
+    // Validate form
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
     setLoading(true);
-    
-    // Simulate login - in real app, this would authenticate with backend
-    setTimeout(() => {
-      setLoading(false);
-      // Redirect to dashboard (would be role-based in real app)
-      navigate("/dashboard");
-    }, 1000);
+
+    const { error } = await signIn(email, password);
+
+    setLoading(false);
+
+    if (error) {
+      if (error.message.includes("Invalid login credentials")) {
+        toast({
+          variant: "destructive",
+          title: "Invalid credentials",
+          description: "The email or password you entered is incorrect.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Sign in failed",
+          description: error.message,
+        });
+      }
+      return;
+    }
+
+    toast({
+      title: "Welcome back!",
+      description: "You have successfully signed in.",
+    });
+
+    // Navigate to the dashboard redirect which will handle role-based routing
+    navigate("/dashboard");
   };
 
   return (
@@ -59,9 +111,9 @@ export default function LoginPage() {
                     className="pl-10"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                   />
                 </div>
+                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
 
               <div className="space-y-2">
@@ -75,9 +127,9 @@ export default function LoginPage() {
                     className="pl-10"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required
                   />
                 </div>
+                {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
               </div>
 
               <div className="flex items-center justify-between">

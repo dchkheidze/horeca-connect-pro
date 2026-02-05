@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -12,6 +13,22 @@ const navLinks = [
 export function PublicNav() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, role, signOut } = useAuth();
+
+  const getDashboardLink = () => {
+    if (!role) return "/dashboard";
+    const roleLinks = {
+      restaurant: "/r/dashboard",
+      supplier: "/s/dashboard",
+      jobseeker: "/j/dashboard",
+    };
+    return roleLinks[role];
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setMobileMenuOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-lg">
@@ -41,12 +58,25 @@ export function PublicNav() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="ghost" asChild>
-            <Link to="/auth/login">Sign in</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/auth/register">Get started</Link>
-          </Button>
+          {user ? (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to={getDashboardLink()}>Dashboard</Link>
+              </Button>
+              <Button variant="outline" onClick={handleSignOut}>
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to="/auth/login">Sign in</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/auth/register">Get started</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -77,18 +107,35 @@ export function PublicNav() {
               </Link>
             ))}
             <hr className="my-2 border-border" />
-            <Link
-              to="/auth/login"
-              className="px-4 py-3 text-sm font-medium hover:bg-secondary rounded-lg"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Sign in
-            </Link>
-            <Button asChild className="mt-2">
-              <Link to="/auth/register" onClick={() => setMobileMenuOpen(false)}>
-                Get started
-              </Link>
-            </Button>
+            {user ? (
+              <>
+                <Link
+                  to={getDashboardLink()}
+                  className="px-4 py-3 text-sm font-medium hover:bg-secondary rounded-lg"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Button variant="outline" onClick={handleSignOut} className="mt-2">
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/auth/login"
+                  className="px-4 py-3 text-sm font-medium hover:bg-secondary rounded-lg"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign in
+                </Link>
+                <Button asChild className="mt-2">
+                  <Link to="/auth/register" onClick={() => setMobileMenuOpen(false)}>
+                    Get started
+                  </Link>
+                </Button>
+              </>
+            )}
           </nav>
         </div>
       )}

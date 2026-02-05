@@ -1,18 +1,34 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function DashboardRedirect() {
   const navigate = useNavigate();
+  const { user, role, loading } = useAuth();
 
   useEffect(() => {
-    // In a real app, this would check the user's role and redirect accordingly
-    // For now, default to restaurant dashboard
-    navigate("/r/dashboard", { replace: true });
-  }, [navigate]);
+    if (loading) return;
+
+    if (!user) {
+      navigate("/auth/login", { replace: true });
+      return;
+    }
+
+    if (role) {
+      const roleRedirects = {
+        restaurant: "/r/dashboard",
+        supplier: "/s/dashboard",
+        jobseeker: "/j/dashboard",
+      };
+      navigate(roleRedirects[role], { replace: true });
+    }
+  }, [user, role, loading, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-muted-foreground">Redirecting to dashboard...</p>
+      <div className="text-center">
+        <div className="animate-pulse text-muted-foreground">Loading your dashboard...</div>
+      </div>
     </div>
   );
 }
