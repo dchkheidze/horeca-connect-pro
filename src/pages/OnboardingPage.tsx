@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { RestaurantOnboarding } from "@/components/onboarding/RestaurantOnboarding";
 import { SupplierOnboarding } from "@/components/onboarding/SupplierOnboarding";
+import { ServiceProviderOnboarding } from "@/components/onboarding/ServiceProviderOnboarding";
 import { JobSeekerOnboarding } from "@/components/onboarding/JobSeekerOnboarding";
 
 export default function OnboardingPage() {
@@ -57,6 +58,13 @@ export default function OnboardingPage() {
           .eq("owner_user_id", user.id)
           .maybeSingle();
         exists = !!data;
+      } else if (role === "serviceprovider") {
+        const { data } = await supabase
+          .from("service_providers")
+          .select("id")
+          .eq("owner_user_id", user.id)
+          .maybeSingle();
+        exists = !!data;
       } else if (role === "jobseeker") {
         const { data } = await supabase
           .from("job_seekers")
@@ -68,9 +76,10 @@ export default function OnboardingPage() {
 
       if (exists) {
         // Profile exists, redirect to dashboard
-        const roleRedirects = {
+        const roleRedirects: Record<string, string> = {
           restaurant: "/r/dashboard",
           supplier: "/s/dashboard",
+          serviceprovider: "/sp/dashboard",
           jobseeker: "/j/dashboard",
         };
         navigate(roleRedirects[role], { replace: true });
@@ -87,9 +96,10 @@ export default function OnboardingPage() {
   const handleComplete = () => {
     if (!role) return;
 
-    const roleRedirects = {
+    const roleRedirects: Record<string, string> = {
       restaurant: "/r/dashboard",
       supplier: "/s/dashboard",
+      serviceprovider: "/sp/dashboard",
       jobseeker: "/j/dashboard",
     };
     navigate(roleRedirects[role], { replace: true });
