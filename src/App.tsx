@@ -30,6 +30,7 @@ import DashboardRedirect from "@/pages/DashboardRedirect";
 // Dashboard Pages
 import RestaurantDashboard from "@/pages/dashboards/RestaurantDashboard";
 import RestaurantJobs from "@/pages/restaurant/RestaurantJobs";
+import RestaurantProfileEdit from "@/pages/restaurant/RestaurantProfileEdit";
 import RestaurantApplications from "@/pages/restaurant/RestaurantApplications";
 import SupplierDashboard from "@/pages/dashboards/SupplierDashboard";
 import SupplierProfileEdit from "@/pages/supplier/SupplierProfileEdit";
@@ -85,7 +86,7 @@ const App = () => (
               <Route path="hr/jobs" element={<RestaurantJobs />} />
               <Route path="hr/applications" element={<RestaurantApplications />} />
               <Route path="suppliers" element={<div className="p-4">Supplier Management - Coming Soon</div>} />
-              <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
+              <Route path="settings" element={<RestaurantProfileEdit />} />
             </Route>
 
             {/* Supplier dashboard routes (protected) */}
