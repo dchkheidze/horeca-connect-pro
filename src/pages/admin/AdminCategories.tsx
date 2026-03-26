@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, UtensilsCrossed, Truck, Briefcase, MapPin } from "lucide-react";
+import { Plus, Pencil, Trash2, UtensilsCrossed, Truck, Briefcase, MapPin, Wrench } from "lucide-react";
 
 interface Category {
   id: string;
@@ -31,11 +31,12 @@ interface Category {
   country?: string;
 }
 
-type CategoryType = "cuisines" | "supplier_categories" | "job_categories" | "cities";
+type CategoryType = "cuisines" | "supplier_categories" | "service_provider_categories" | "job_categories" | "cities";
 
 const categoryConfig: Record<CategoryType, { label: string; icon: React.ComponentType<any> }> = {
   cuisines: { label: "Cuisines", icon: UtensilsCrossed },
   supplier_categories: { label: "Supplier Categories", icon: Truck },
+  service_provider_categories: { label: "Service Provider Categories", icon: Wrench },
   job_categories: { label: "Job Categories", icon: Briefcase },
   cities: { label: "Cities", icon: MapPin },
 };
@@ -45,6 +46,7 @@ export default function AdminCategories() {
   const [categories, setCategories] = useState<Record<CategoryType, Category[]>>({
     cuisines: [],
     supplier_categories: [],
+    service_provider_categories: [],
     job_categories: [],
     cities: [],
   });
@@ -61,9 +63,10 @@ export default function AdminCategories() {
 
   const fetchCategories = async () => {
     try {
-      const [cuisinesRes, supplierCatsRes, jobCatsRes, citiesRes] = await Promise.all([
+      const [cuisinesRes, supplierCatsRes, spCatsRes, jobCatsRes, citiesRes] = await Promise.all([
         supabase.from("cuisines").select("*").order("name"),
         supabase.from("supplier_categories").select("*").order("name"),
+        supabase.from("service_provider_categories").select("*").order("name"),
         supabase.from("job_categories").select("*").order("name"),
         supabase.from("cities").select("*").order("name"),
       ]);
@@ -71,6 +74,7 @@ export default function AdminCategories() {
       setCategories({
         cuisines: cuisinesRes.data || [],
         supplier_categories: supplierCatsRes.data || [],
+        service_provider_categories: spCatsRes.data || [],
         job_categories: jobCatsRes.data || [],
         cities: citiesRes.data || [],
       });
@@ -257,7 +261,7 @@ export default function AdminCategories() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as CategoryType)}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           {(Object.keys(categoryConfig) as CategoryType[]).map((type) => {
             const config = categoryConfig[type];
             return (

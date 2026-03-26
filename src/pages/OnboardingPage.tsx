@@ -139,6 +139,10 @@ export default function OnboardingPage() {
           <SupplierOnboarding userId={user.id} onComplete={handleComplete} />
         )}
 
+        {role === "serviceprovider" && (
+          <ServiceProviderOnboarding userId={user.id} onComplete={handleComplete} />
+        )}
+
         {role === "jobseeker" && (
           <JobSeekerOnboarding 
             userId={user.id} 
