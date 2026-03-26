@@ -18,6 +18,8 @@ import { AdminLayout } from "@/components/layout/AdminLayout";
 import LandingPage from "@/pages/LandingPage";
 import SuppliersPage from "@/pages/SuppliersPage";
 import SupplierProfilePage from "@/pages/SupplierProfilePage";
+import ServiceProvidersPage from "@/pages/ServiceProvidersPage";
+import ServiceProviderProfilePage from "@/pages/ServiceProviderProfilePage";
 import JobsPage from "@/pages/JobsPage";
 import JobDetailPage from "@/pages/JobDetailPage";
 
