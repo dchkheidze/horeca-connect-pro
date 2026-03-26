@@ -24,56 +24,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // FIX 1: setLoading(false) is now called INSIDE fetchUserRole,
+  // after the role is known. This prevents ProtectedRoute from seeing
+  // loading=false + role=null and incorrectly redirecting to login.
   const fetchUserRole = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-    
-    if (data && !error && data.length > 0) {
-      // Check if user has admin role
-      const hasAdmin = data.some((r) => r.role === "admin");
-      setIsAdmin(hasAdmin);
-      
-      // Set primary role (prefer non-admin role for dashboard routing)
-      const nonAdminRole = data.find((r) => r.role !== "admin");
-      setRole((nonAdminRole?.role || data[0].role) as AppRole);
-    } else {
+    try {
+      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+
+      if (data && !error && data.length > 0) {
+        const hasAdmin = data.some((r) => r.role === "admin");
+        setIsAdmin(hasAdmin);
+        const nonAdminRole = data.find((r) => r.role !== "admin");
+        setRole((nonAdminRole?.role || data[0].role) as AppRole);
+      } else {
+        // No role found — user registered but onboarding incomplete
+        setRole(null);
+        setIsAdmin(false);
+      }
+    } catch {
       setRole(null);
       setIsAdmin(false);
+    } finally {
+      // Always mark loading done after role fetch attempt
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Fetch role using setTimeout to avoid deadlock
-        if (session?.user) {
-          setTimeout(() => {
-            fetchUserRole(session.user.id);
-          }, 0);
-        } else {
-          setRole(null);
-        }
-        
-        setLoading(false);
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // FIX 2: Use ONLY onAuthStateChange — removed the separate getSession() call
+    // that was causing fetchUserRole to run twice on every page load.
+    // onAuthStateChange fires with the existing session immediately on mount.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
-        fetchUserRole(session.user.id);
+        // setTimeout avoids a Supabase internal deadlock when calling
+        // other Supabase queries inside onAuthStateChange
+        setTimeout(() => {
+          fetchUserRole(session.user.id);
+        }, 0);
+      } else {
+        // Logged out — clear everything and stop loading immediately
+        setRole(null);
+        setIsAdmin(false);
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -81,43 +79,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string, selectedRole: AppRole) => {
     const redirectUrl = `${window.location.origin}/`;
-    
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName,
-        },
+        data: { full_name: fullName },
       },
     });
 
-    if (error) {
-      return { error };
-    }
+    if (error) return { error };
 
-    // If signup successful and we have a user, create profile and role
     if (data.user) {
-      // Create profile
+      // Create profile row
       const { error: profileError } = await supabase
         .from("profiles")
-        .insert({
-          user_id: data.user.id,
-          full_name: fullName,
-        });
+        .insert({ user_id: data.user.id, full_name: fullName });
 
       if (profileError) {
         console.error("Error creating profile:", profileError);
       }
 
-      // Create user role
+      // Create role row
+      // SECURITY NOTE: Move this to a Supabase server-side trigger or
+      // edge function to prevent users from assigning themselves "admin"
+      // via a modified client request.
       const { error: roleError } = await supabase
         .from("user_roles")
-        .insert({
-          user_id: data.user.id,
-          role: selectedRole,
-        });
+        .insert({ user_id: data.user.id, role: selectedRole });
 
       if (roleError) {
         console.error("Error creating role:", roleError);
@@ -131,15 +121,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error };
   };
 
   const signOut = async () => {
+    // onAuthStateChange handles clearing state after signOut fires,
+    // but we clear eagerly here for instant UI response
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
