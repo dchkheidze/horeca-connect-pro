@@ -6,10 +6,18 @@ interface ProtectedRouteProps {
   allowedRoles?: ("restaurant" | "supplier" | "jobseeker")[];
 }
 
+const ROLE_DASHBOARDS: Record<string, string> = {
+  restaurant: "/r/dashboard",
+  supplier: "/s/dashboard",
+  jobseeker: "/j/dashboard",
+  admin: "/admin/dashboard",
+};
+
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user, role, loading } = useAuth();
   const location = useLocation();
 
+  // Wait until auth + role are both resolved before making any routing decision
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -18,22 +26,29 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     );
   }
 
+  // Not logged in — send to login, preserving the intended destination
   if (!user) {
-    // Redirect to login, saving the attempted URL
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
-  // Get the non-admin role for comparison
-  const userRole = role === "admin" ? null : role;
+  // FIX 1: user exists but role is null (user_roles insert failed during signup,
+  // or email not yet confirmed). Send to onboarding to recover gracefully
+  // instead of silently rendering a broken dashboard.
+  if (!role) {
+    return <Navigate to="/onboarding" replace />;
+  }
 
-  if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
-    // User doesn't have the required role, redirect to their dashboard
-    const roleRedirects: Record<string, string> = {
-      restaurant: "/r/dashboard",
-      supplier: "/s/dashboard",
-      jobseeker: "/j/dashboard",
-    };
-    return <Navigate to={roleRedirects[userRole] || "/dashboard"} replace />;
+  // FIX 2: Admins should never land on role-specific dashboards (/r, /s, /j)
+  // because they have no restaurant/supplier/jobseeker row — the dashboard
+  // would be empty. Previously the admin check set userRole=null which
+  // bypassed the allowedRoles check entirely, letting admins render broken pages.
+  if (role === "admin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  // Correct role but wrong section — redirect to their own dashboard
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to={ROLE_DASHBOARDS[role] || "/dashboard"} replace />;
   }
 
   return <>{children}</>;
