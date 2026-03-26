@@ -85,7 +85,7 @@ const App = () => (
               <Route path="dashboard" element={<RestaurantDashboard />} />
               <Route path="hr/jobs" element={<RestaurantJobs />} />
               <Route path="hr/applications" element={<RestaurantApplications />} />
-              <Route path="suppliers" element={<div className="p-4">Supplier Management - Coming Soon</div>} />
+              <Route path="suppliers" element={<SuppliersPage />} />
               <Route path="settings" element={<RestaurantProfileEdit />} />
             </Route>
 
