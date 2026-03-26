@@ -336,6 +336,122 @@ export type Database = {
         }
         Relationships: []
       }
+      service_provider_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      service_provider_offers: {
+        Row: {
+          created_at: string
+          currency: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          price_from: number | null
+          service_provider_id: string
+          title: string
+          type: Database["public"]["Enums"]["offer_type"] | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          price_from?: number | null
+          service_provider_id: string
+          title: string
+          type?: Database["public"]["Enums"]["offer_type"] | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          price_from?: number | null
+          service_provider_id?: string
+          title?: string
+          type?: Database["public"]["Enums"]["offer_type"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_provider_offers_service_provider_id_fkey"
+            columns: ["service_provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_providers: {
+        Row: {
+          address: string | null
+          categories: string[] | null
+          city: string | null
+          coverage_areas: string[] | null
+          created_at: string
+          description: string | null
+          id: string
+          is_published: boolean | null
+          name: string
+          owner_user_id: string
+          phone: string | null
+          slug: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          categories?: string[] | null
+          city?: string | null
+          coverage_areas?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean | null
+          name: string
+          owner_user_id: string
+          phone?: string | null
+          slug?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          categories?: string[] | null
+          city?: string | null
+          coverage_areas?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean | null
+          name?: string
+          owner_user_id?: string
+          phone?: string | null
+          slug?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       supplier_categories: {
         Row: {
           created_at: string
@@ -492,7 +608,12 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "restaurant" | "supplier" | "jobseeker" | "admin"
+      app_role:
+        | "restaurant"
+        | "supplier"
+        | "jobseeker"
+        | "admin"
+        | "serviceprovider"
       application_status:
         | "APPLIED"
         | "SHORTLISTED"
@@ -630,7 +751,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["restaurant", "supplier", "jobseeker", "admin"],
+      app_role: [
+        "restaurant",
+        "supplier",
+        "jobseeker",
+        "admin",
+        "serviceprovider",
+      ],
       application_status: [
         "APPLIED",
         "SHORTLISTED",
