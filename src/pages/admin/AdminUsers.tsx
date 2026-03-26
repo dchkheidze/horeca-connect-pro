@@ -34,11 +34,12 @@ interface UserWithRoles {
   roles: AppRole[];
 }
 
-const ALL_ROLES: AppRole[] = ["restaurant", "supplier", "jobseeker", "admin"];
+const ALL_ROLES: AppRole[] = ["restaurant", "supplier", "serviceprovider", "jobseeker", "admin"];
 
 const roleColors: Record<AppRole, string> = {
   restaurant: "bg-primary/10 text-primary",
   supplier: "bg-supplier/10 text-supplier",
+  serviceprovider: "bg-accent/10 text-accent-foreground",
   jobseeker: "bg-jobseeker/10 text-jobseeker",
   admin: "bg-destructive/10 text-destructive",
 };
@@ -300,6 +301,7 @@ export default function AdminUsers() {
                       {role === "admin" && "Full access to admin panel"}
                       {role === "restaurant" && "Can manage restaurant and jobs"}
                       {role === "supplier" && "Can manage supplier profile and offers"}
+                      {role === "serviceprovider" && "Can manage service provider profile and offers"}
                       {role === "jobseeker" && "Can apply for jobs"}
                     </p>
                   </div>
