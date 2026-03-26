@@ -14,12 +14,13 @@ const registerSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
   email: z.string().trim().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["restaurant", "supplier", "jobseeker"], { required_error: "Please select an account type" }),
+  role: z.enum(["restaurant", "supplier", "serviceprovider", "jobseeker"], { required_error: "Please select an account type" }),
 });
 
 const roleLabels: Record<Exclude<AppRole, "admin">, string> = {
   restaurant: "Restaurant representative",
   supplier: "Supplier representative",
+  serviceprovider: "Service provider",
   jobseeker: "Job seeker",
 };
 
@@ -175,6 +176,7 @@ export default function RegisterPage() {
                   <SelectContent>
                     <SelectItem value="restaurant">{roleLabels.restaurant}</SelectItem>
                     <SelectItem value="supplier">{roleLabels.supplier}</SelectItem>
+                    <SelectItem value="serviceprovider">{roleLabels.serviceprovider}</SelectItem>
                     <SelectItem value="jobseeker">{roleLabels.jobseeker}</SelectItem>
                   </SelectContent>
                 </Select>

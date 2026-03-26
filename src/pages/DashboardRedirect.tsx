@@ -36,6 +36,13 @@ export default function DashboardRedirect() {
           .eq("owner_user_id", user.id)
           .maybeSingle();
         profileExists = !!data;
+      } else if (role === "serviceprovider") {
+        const { data } = await supabase
+          .from("service_providers")
+          .select("id")
+          .eq("owner_user_id", user.id)
+          .maybeSingle();
+        profileExists = !!data;
       } else if (role === "jobseeker") {
         const { data } = await supabase
           .from("job_seekers")
@@ -52,9 +59,10 @@ export default function DashboardRedirect() {
       }
 
       // Redirect to appropriate dashboard
-      const roleRedirects = {
+      const roleRedirects: Record<string, string> = {
         restaurant: "/r/dashboard",
         supplier: "/s/dashboard",
+        serviceprovider: "/sp/dashboard",
         jobseeker: "/j/dashboard",
       };
       navigate(roleRedirects[role], { replace: true });

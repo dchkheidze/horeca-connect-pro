@@ -8,13 +8,14 @@ import {
   Settings, 
   LogOut,
   Menu,
-  Package
+  Package,
+  Wrench
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardLayoutProps {
-  role: "restaurant" | "supplier" | "jobseeker";
+  role: "restaurant" | "supplier" | "jobseeker" | "serviceprovider";
 }
 
 const roleConfig = {
@@ -39,6 +40,17 @@ const roleConfig = {
       { icon: Building2, label: "Profile", href: "/s/profile" },
       { icon: Package, label: "Offers", href: "/s/offers" },
       { icon: Settings, label: "Settings", href: "/s/settings" },
+    ],
+  },
+  serviceprovider: {
+    title: "Service Provider Portal",
+    prefix: "/sp",
+    color: "bg-accent",
+    navItems: [
+      { icon: LayoutDashboard, label: "Dashboard", href: "/sp/dashboard" },
+      { icon: Building2, label: "Profile", href: "/sp/profile" },
+      { icon: Wrench, label: "Services", href: "/sp/offers" },
+      { icon: Settings, label: "Settings", href: "/sp/settings" },
     ],
   },
   jobseeker: {

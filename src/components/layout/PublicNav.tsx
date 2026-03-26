@@ -21,6 +21,7 @@ export function PublicNav() {
     const roleLinks: Record<string, string> = {
       restaurant: "/r/dashboard",
       supplier: "/s/dashboard",
+      serviceprovider: "/sp/dashboard",
       jobseeker: "/j/dashboard",
     };
     return roleLinks[role] || "/dashboard";

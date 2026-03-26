@@ -35,6 +35,9 @@ import RestaurantApplications from "@/pages/restaurant/RestaurantApplications";
 import SupplierDashboard from "@/pages/dashboards/SupplierDashboard";
 import SupplierProfileEdit from "@/pages/supplier/SupplierProfileEdit";
 import SupplierOffers from "@/pages/supplier/SupplierOffers";
+import ServiceProviderDashboard from "@/pages/dashboards/ServiceProviderDashboard";
+import ServiceProviderProfileEdit from "@/pages/serviceprovider/ServiceProviderProfileEdit";
+import ServiceProviderOffers from "@/pages/serviceprovider/ServiceProviderOffers";
 import JobSeekerDashboard from "@/pages/dashboards/JobSeekerDashboard";
 import JobSeekerProfile from "@/pages/jobseeker/JobSeekerProfile";
 import JobSeekerApplications from "@/pages/jobseeker/JobSeekerApplications";
@@ -101,6 +104,21 @@ const App = () => (
               <Route path="dashboard" element={<SupplierDashboard />} />
               <Route path="profile" element={<SupplierProfileEdit />} />
               <Route path="offers" element={<SupplierOffers />} />
+              <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
+            </Route>
+
+            {/* Service Provider dashboard routes (protected) */}
+            <Route
+              path="/sp"
+              element={
+                <ProtectedRoute allowedRoles={["serviceprovider"]}>
+                  <DashboardLayout role="serviceprovider" />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="dashboard" element={<ServiceProviderDashboard />} />
+              <Route path="profile" element={<ServiceProviderProfileEdit />} />
+              <Route path="offers" element={<ServiceProviderOffers />} />
               <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
             </Route>
 
