@@ -18,6 +18,8 @@ import { AdminLayout } from "@/components/layout/AdminLayout";
 import LandingPage from "@/pages/LandingPage";
 import SuppliersPage from "@/pages/SuppliersPage";
 import SupplierProfilePage from "@/pages/SupplierProfilePage";
+import ServiceProvidersPage from "@/pages/ServiceProvidersPage";
+import ServiceProviderProfilePage from "@/pages/ServiceProviderProfilePage";
 import JobsPage from "@/pages/JobsPage";
 import JobDetailPage from "@/pages/JobDetailPage";
 
@@ -66,6 +68,8 @@ const App = () => (
               <Route path="/" element={<LandingPage />} />
               <Route path="/suppliers" element={<SuppliersPage />} />
               <Route path="/suppliers/:slug" element={<SupplierProfilePage />} />
+              <Route path="/service-providers" element={<ServiceProvidersPage />} />
+              <Route path="/service-providers/:slug" element={<ServiceProviderProfilePage />} />
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/jobs/:slug" element={<JobDetailPage />} />
             </Route>
