@@ -75,7 +75,12 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const config = roleConfig[role];
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { signOut, user } = useAuth();
+  const { signOut, user, roles } = useAuth();
+
+  // Check if user has other portal roles
+  const otherPortals = roles.filter(
+    (r) => r !== "admin" && r !== role && r in roleConfig
+  ) as Array<keyof typeof roleConfig>;
 
   const handleSignOut = async () => {
     await signOut();
