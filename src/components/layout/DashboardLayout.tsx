@@ -9,7 +9,8 @@ import {
   LogOut,
   Menu,
   Package,
-  Wrench
+  Wrench,
+  FileText
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +26,7 @@ const roleConfig = {
     color: "bg-primary",
     navItems: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/r/dashboard" },
+      { icon: FileText, label: "RFQs", href: "/r/rfqs" },
       { icon: Briefcase, label: "Jobs", href: "/r/hr/jobs" },
       { icon: Users, label: "Applications", href: "/r/hr/applications" },
       { icon: Building2, label: "Suppliers", href: "/r/suppliers" },
@@ -39,6 +41,7 @@ const roleConfig = {
       { icon: LayoutDashboard, label: "Dashboard", href: "/s/dashboard" },
       { icon: Building2, label: "Profile", href: "/s/profile" },
       { icon: Package, label: "Offers", href: "/s/offers" },
+      { icon: FileText, label: "RFQs", href: "/s/rfqs" },
       { icon: Settings, label: "Settings", href: "/s/settings" },
     ],
   },
@@ -50,6 +53,7 @@ const roleConfig = {
       { icon: LayoutDashboard, label: "Dashboard", href: "/sp/dashboard" },
       { icon: Building2, label: "Profile", href: "/sp/profile" },
       { icon: Wrench, label: "Services", href: "/sp/offers" },
+      { icon: FileText, label: "RFQs", href: "/sp/rfqs" },
       { icon: Settings, label: "Settings", href: "/sp/settings" },
     ],
   },
