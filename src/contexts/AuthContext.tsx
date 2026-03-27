@@ -8,9 +8,10 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   role: AppRole | null;
+  roles: AppRole[];
   isAdmin: boolean;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, selectedRoles: AppRole[]) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -20,40 +21,34 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<AppRole | null>(null);
+  const [roles, setRoles] = useState<AppRole[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // FIX 1: setLoading(false) is now called INSIDE fetchUserRole,
-  // after the role is known. This prevents ProtectedRoute from seeing
-  // loading=false + role=null and incorrectly redirecting to login.
+  // Primary role for backward compat — first non-admin role
+  const role: AppRole | null = roles.find((r) => r !== "admin") || roles[0] || null;
+
   const fetchUserRole = async (userId: string) => {
     try {
       const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
 
       if (data && !error && data.length > 0) {
-        const hasAdmin = data.some((r) => r.role === "admin");
-        setIsAdmin(hasAdmin);
-        const nonAdminRole = data.find((r) => r.role !== "admin");
-        setRole((nonAdminRole?.role || data[0].role) as AppRole);
+        const allRoles = data.map((r) => r.role as AppRole);
+        setRoles(allRoles);
+        setIsAdmin(allRoles.includes("admin"));
       } else {
-        // No role found — user registered but onboarding incomplete
-        setRole(null);
+        setRoles([]);
         setIsAdmin(false);
       }
     } catch {
-      setRole(null);
+      setRoles([]);
       setIsAdmin(false);
     } finally {
-      // Always mark loading done after role fetch attempt
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    // FIX 2: Use ONLY onAuthStateChange — removed the separate getSession() call
-    // that was causing fetchUserRole to run twice on every page load.
-    // onAuthStateChange fires with the existing session immediately on mount.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -61,14 +56,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        // setTimeout avoids a Supabase internal deadlock when calling
-        // other Supabase queries inside onAuthStateChange
         setTimeout(() => {
           fetchUserRole(session.user.id);
         }, 0);
       } else {
-        // Logged out — clear everything and stop loading immediately
-        setRole(null);
+        setRoles([]);
         setIsAdmin(false);
         setLoading(false);
       }
@@ -77,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, selectedRole: AppRole) => {
+  const signUp = async (email: string, password: string, fullName: string, selectedRoles: AppRole[]) => {
     const redirectUrl = `${window.location.origin}/`;
 
     const { data, error } = await supabase.auth.signUp({
@@ -101,20 +93,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("Error creating profile:", profileError);
       }
 
-      // Create role row
-      // SECURITY NOTE: Move this to a Supabase server-side trigger or
-      // edge function to prevent users from assigning themselves "admin"
-      // via a modified client request.
-      const { error: roleError } = await supabase
-        .from("user_roles")
-        .insert({ user_id: data.user.id, role: selectedRole });
+      // Create role rows
+      const roleInserts = selectedRoles.map((r) => ({ user_id: data.user!.id, role: r }));
+      const { error: roleError } = await supabase.from("user_roles").insert(roleInserts);
 
       if (roleError) {
-        console.error("Error creating role:", roleError);
+        console.error("Error creating roles:", roleError);
         return { error: roleError };
       }
 
-      setRole(selectedRole);
+      setRoles(selectedRoles);
     }
 
     return { error: null };
@@ -126,17 +114,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    // onAuthStateChange handles clearing state after signOut fires,
-    // but we clear eagerly here for instant UI response
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
-    setRole(null);
+    setRoles([]);
     setIsAdmin(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, isAdmin, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, roles, isAdmin, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

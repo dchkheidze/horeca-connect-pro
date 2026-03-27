@@ -10,26 +10,34 @@ import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
+type RoleOption = "restaurant" | "supplier" | "serviceprovider" | "supplier_serviceprovider" | "jobseeker";
+
 const registerSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
   email: z.string().trim().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["restaurant", "supplier", "serviceprovider", "jobseeker"], { required_error: "Please select an account type" }),
+  roleOption: z.enum(["restaurant", "supplier", "serviceprovider", "supplier_serviceprovider", "jobseeker"], { required_error: "Please select an account type" }),
 });
 
-const roleLabels: Record<Exclude<AppRole, "admin">, string> = {
+const roleOptionLabels: Record<RoleOption, string> = {
   restaurant: "Restaurant representative",
   supplier: "Supplier representative",
   serviceprovider: "Service provider",
+  supplier_serviceprovider: "Supplier & Service provider",
   jobseeker: "Job seeker",
 };
+
+function roleOptionToRoles(option: RoleOption): AppRole[] {
+  if (option === "supplier_serviceprovider") return ["supplier", "serviceprovider"];
+  return [option as AppRole];
+}
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "" as AppRole | "",
+    roleOption: "" as RoleOption | "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -41,7 +49,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setErrors({});
 
-    // Validate form
     const result = registerSchema.safeParse(formData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -56,11 +63,13 @@ export default function RegisterPage() {
 
     setLoading(true);
 
+    const selectedRoles = roleOptionToRoles(formData.roleOption as RoleOption);
+
     const { error } = await signUp(
       formData.email,
       formData.password,
       formData.name,
-      formData.role as AppRole
+      selectedRoles
     );
 
     setLoading(false);
@@ -87,7 +96,6 @@ export default function RegisterPage() {
       description: "Welcome to HoReCa Hub. Let's set up your profile...",
     });
 
-    // Redirect to onboarding
     navigate("/onboarding");
   };
 
@@ -167,20 +175,21 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label htmlFor="role">Account Type</Label>
                 <Select
-                  value={formData.role}
-                  onValueChange={(value: AppRole) => setFormData({ ...formData, role: value })}
+                  value={formData.roleOption}
+                  onValueChange={(value: RoleOption) => setFormData({ ...formData, roleOption: value })}
                 >
                   <SelectTrigger id="role">
                     <SelectValue placeholder="Select your account type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="restaurant">{roleLabels.restaurant}</SelectItem>
-                    <SelectItem value="supplier">{roleLabels.supplier}</SelectItem>
-                    <SelectItem value="serviceprovider">{roleLabels.serviceprovider}</SelectItem>
-                    <SelectItem value="jobseeker">{roleLabels.jobseeker}</SelectItem>
+                    <SelectItem value="restaurant">{roleOptionLabels.restaurant}</SelectItem>
+                    <SelectItem value="supplier">{roleOptionLabels.supplier}</SelectItem>
+                    <SelectItem value="serviceprovider">{roleOptionLabels.serviceprovider}</SelectItem>
+                    <SelectItem value="supplier_serviceprovider">{roleOptionLabels.supplier_serviceprovider}</SelectItem>
+                    <SelectItem value="jobseeker">{roleOptionLabels.jobseeker}</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
+                {errors.roleOption && <p className="text-sm text-destructive">{errors.roleOption}</p>}
               </div>
 
               <Button type="submit" className="w-full" size="lg" disabled={loading}>
