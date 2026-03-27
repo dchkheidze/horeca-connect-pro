@@ -96,7 +96,7 @@ export default function RegisterPage() {
       description: "Welcome to HoReCa Hub. Let's set up your profile...",
     });
 
-    navigate("/onboarding");
+    navigate("/dashboard");
   };
 
   return (
