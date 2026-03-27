@@ -77,31 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         emailRedirectTo: redirectUrl,
-        data: { full_name: fullName },
+        data: { full_name: fullName, roles: selectedRoles },
       },
     });
 
     if (error) return { error };
 
     if (data.user) {
-      // Create profile row
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({ user_id: data.user.id, full_name: fullName });
-
-      if (profileError) {
-        console.error("Error creating profile:", profileError);
-      }
-
-      // Create role rows
-      const roleInserts = selectedRoles.map((r) => ({ user_id: data.user!.id, role: r }));
-      const { error: roleError } = await supabase.from("user_roles").insert(roleInserts);
-
-      if (roleError) {
-        console.error("Error creating roles:", roleError);
-        return { error: roleError };
-      }
-
       setRoles(selectedRoles);
     }
 
