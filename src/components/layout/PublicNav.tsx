@@ -15,7 +15,7 @@ const navLinks = [
 export function PublicNav() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, role, isAdmin, signOut } = useAuth();
+  const { user, role, roles, isAdmin, signOut } = useAuth();
 
   const getDashboardLink = () => {
     if (!role) return "/dashboard";
