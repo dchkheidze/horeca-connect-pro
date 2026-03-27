@@ -23,6 +23,7 @@ import ServiceProviderProfilePage from "@/pages/ServiceProviderProfilePage";
 import JobsPage from "@/pages/JobsPage";
 import JobDetailPage from "@/pages/JobDetailPage";
 import BlogPage from "@/pages/BlogPage";
+import BlogPostPage from "@/pages/BlogPostPage";
 
 // Auth Pages
 import LoginPage from "@/pages/auth/LoginPage";
@@ -77,6 +78,7 @@ const App = () => (
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/jobs/:slug" element={<JobDetailPage />} />
               <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
             </Route>
 
             {/* Auth routes (no layout) */}
