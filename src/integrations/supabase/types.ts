@@ -336,6 +336,86 @@ export type Database = {
         }
         Relationships: []
       }
+      rfq_responses: {
+        Row: {
+          created_at: string
+          currency: string | null
+          id: string
+          message: string | null
+          price_estimate: number | null
+          responder_type: string
+          responder_user_id: string
+          rfq_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          id?: string
+          message?: string | null
+          price_estimate?: number | null
+          responder_type: string
+          responder_user_id: string
+          rfq_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          id?: string
+          message?: string | null
+          price_estimate?: number | null
+          responder_type?: string
+          responder_user_id?: string
+          rfq_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rfq_responses_rfq_id_fkey"
+            columns: ["rfq_id"]
+            isOneToOne: false
+            referencedRelation: "rfqs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rfqs: {
+        Row: {
+          category: string | null
+          created_at: string
+          deadline: string | null
+          description: string | null
+          id: string
+          restaurant_id: string
+          rfq_type: Database["public"]["Enums"]["rfq_type"]
+          status: Database["public"]["Enums"]["rfq_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          restaurant_id: string
+          rfq_type?: Database["public"]["Enums"]["rfq_type"]
+          status?: Database["public"]["Enums"]["rfq_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          restaurant_id?: string
+          rfq_type?: Database["public"]["Enums"]["rfq_type"]
+          status?: Database["public"]["Enums"]["rfq_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_provider_categories: {
         Row: {
           created_at: string
@@ -623,6 +703,8 @@ export type Database = {
         | "HIRED"
       job_status: "DRAFT" | "PUBLISHED" | "CLOSED"
       offer_type: "PRODUCT" | "SERVICE"
+      rfq_status: "OPEN" | "CLOSED" | "AWARDED"
+      rfq_type: "GOODS" | "SERVICES"
       visibility_status: "PRIVATE" | "PUBLIC"
     }
     CompositeTypes: {
@@ -768,6 +850,8 @@ export const Constants = {
       ],
       job_status: ["DRAFT", "PUBLISHED", "CLOSED"],
       offer_type: ["PRODUCT", "SERVICE"],
+      rfq_status: ["OPEN", "CLOSED", "AWARDED"],
+      rfq_type: ["GOODS", "SERVICES"],
       visibility_status: ["PRIVATE", "PUBLIC"],
     },
   },
