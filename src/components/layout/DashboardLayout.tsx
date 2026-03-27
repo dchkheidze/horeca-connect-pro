@@ -124,6 +124,21 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
+          {otherPortals.length > 0 && (
+            <div className="mb-3 space-y-1">
+              {otherPortals.map((portalRole) => (
+                <Link
+                  key={portalRole}
+                  to={roleConfig[portalRole].navItems[0].href}
+                  onClick={() => setSidebarOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Switch to {roleConfig[portalRole].title}
+                </Link>
+              ))}
+            </div>
+          )}
           <div className="mb-3 px-3 text-xs text-muted-foreground truncate">
             {user?.email}
           </div>
