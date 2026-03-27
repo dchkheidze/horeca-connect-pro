@@ -274,6 +274,12 @@ export default function SupplierDashboard() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
+            <Button variant="outline" className="justify-between" asChild>
+              <Link to="/s/rfqs">
+                Browse RFQs
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
             {supplier.is_published && (
               <Button variant="outline" className="justify-between" asChild>
                 <a href={`/suppliers/${supplier.slug}`} target="_blank" rel="noopener noreferrer">

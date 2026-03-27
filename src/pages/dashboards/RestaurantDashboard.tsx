@@ -1,23 +1,60 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   Building2, 
   Briefcase, 
   TrendingUp, 
   Users,
   ArrowRight,
-  Plus
+  Plus,
+  FileText,
+  Loader2
 } from "lucide-react";
 
-const stats = [
-  { title: "Active Suppliers", value: "24", icon: Building2, change: "+3 this month" },
-  { title: "Open Jobs", value: "5", icon: Briefcase, change: "2 pending review" },
-  { title: "Applications", value: "47", icon: Users, change: "+12 this week" },
-  { title: "Views", value: "1,234", icon: TrendingUp, change: "+8% vs last week" },
-];
-
 export default function RestaurantDashboard() {
+  const { user } = useAuth();
+  const [rfqCount, setRfqCount] = useState(0);
+  const [openRfqCount, setOpenRfqCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!user) return;
+      const { data: restaurant } = await supabase
+        .from("restaurants")
+        .select("id")
+        .eq("owner_user_id", user.id)
+        .maybeSingle();
+
+      if (restaurant) {
+        const { count: total } = await supabase
+          .from("rfqs")
+          .select("*", { count: "exact", head: true })
+          .eq("restaurant_id", restaurant.id);
+        const { count: open } = await supabase
+          .from("rfqs")
+          .select("*", { count: "exact", head: true })
+          .eq("restaurant_id", restaurant.id)
+          .eq("status", "OPEN");
+        setRfqCount(total || 0);
+        setOpenRfqCount(open || 0);
+      }
+      setLoading(false);
+    };
+    fetchStats();
+  }, [user]);
+
+  const stats = [
+    { title: "Active Suppliers", value: "24", icon: Building2, change: "+3 this month" },
+    { title: "Open RFQs", value: String(openRfqCount), icon: FileText, change: `${rfqCount} total` },
+    { title: "Applications", value: "47", icon: Users, change: "+12 this week" },
+    { title: "Views", value: "1,234", icon: TrendingUp, change: "+8% vs last week" },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -102,7 +139,13 @@ export default function RestaurantDashboard() {
               </Link>
             </Button>
             <Button variant="outline" className="justify-between" asChild>
-              <Link to="/r/jobs">
+              <Link to="/r/rfqs">
+                Manage RFQs ({rfqCount})
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" className="justify-between" asChild>
+              <Link to="/r/hr/jobs">
                 Manage Job Postings
                 <ArrowRight className="h-4 w-4" />
               </Link>

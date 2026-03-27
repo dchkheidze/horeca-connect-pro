@@ -34,12 +34,15 @@ import RestaurantDashboard from "@/pages/dashboards/RestaurantDashboard";
 import RestaurantJobs from "@/pages/restaurant/RestaurantJobs";
 import RestaurantProfileEdit from "@/pages/restaurant/RestaurantProfileEdit";
 import RestaurantApplications from "@/pages/restaurant/RestaurantApplications";
+import RestaurantRFQs from "@/pages/restaurant/RestaurantRFQs";
 import SupplierDashboard from "@/pages/dashboards/SupplierDashboard";
 import SupplierProfileEdit from "@/pages/supplier/SupplierProfileEdit";
 import SupplierOffers from "@/pages/supplier/SupplierOffers";
+import SupplierRFQs from "@/pages/supplier/SupplierRFQs";
 import ServiceProviderDashboard from "@/pages/dashboards/ServiceProviderDashboard";
 import ServiceProviderProfileEdit from "@/pages/serviceprovider/ServiceProviderProfileEdit";
 import ServiceProviderOffers from "@/pages/serviceprovider/ServiceProviderOffers";
+import ServiceProviderRFQs from "@/pages/serviceprovider/ServiceProviderRFQs";
 import JobSeekerDashboard from "@/pages/dashboards/JobSeekerDashboard";
 import JobSeekerProfile from "@/pages/jobseeker/JobSeekerProfile";
 import JobSeekerApplications from "@/pages/jobseeker/JobSeekerApplications";
@@ -90,6 +93,7 @@ const App = () => (
               }
             >
               <Route path="dashboard" element={<RestaurantDashboard />} />
+              <Route path="rfqs" element={<RestaurantRFQs />} />
               <Route path="hr/jobs" element={<RestaurantJobs />} />
               <Route path="hr/applications" element={<RestaurantApplications />} />
               <Route path="suppliers" element={<SuppliersPage />} />
@@ -108,6 +112,7 @@ const App = () => (
               <Route path="dashboard" element={<SupplierDashboard />} />
               <Route path="profile" element={<SupplierProfileEdit />} />
               <Route path="offers" element={<SupplierOffers />} />
+              <Route path="rfqs" element={<SupplierRFQs />} />
               <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
             </Route>
 
@@ -123,6 +128,7 @@ const App = () => (
               <Route path="dashboard" element={<ServiceProviderDashboard />} />
               <Route path="profile" element={<ServiceProviderProfileEdit />} />
               <Route path="offers" element={<ServiceProviderOffers />} />
+              <Route path="rfqs" element={<ServiceProviderRFQs />} />
               <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
             </Route>
 
