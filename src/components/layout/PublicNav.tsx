@@ -9,6 +9,7 @@ const navLinks = [
   { href: "/suppliers", label: "Suppliers" },
   { href: "/service-providers", label: "Service Providers" },
   { href: "/jobs", label: "Jobs" },
+  { href: "/blog", label: "Blog" },
 ];
 
 export function PublicNav() {
