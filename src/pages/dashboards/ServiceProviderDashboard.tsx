@@ -267,6 +267,12 @@ export default function ServiceProviderDashboard() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
+            <Button variant="outline" className="justify-between" asChild>
+              <Link to="/sp/rfqs">
+                Browse RFQs
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
             {provider.is_published && (
               <Button variant="outline" className="justify-between" asChild>
                 <a href={`/service-providers/${provider.slug}`} target="_blank" rel="noopener noreferrer">
