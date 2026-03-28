@@ -32,6 +32,8 @@ interface UserWithRoles {
   full_name: string | null;
   created_at: string;
   roles: AppRole[];
+  subscription_plan: string | null;
+  subscription_billing: string | null;
 }
 
 const ALL_ROLES: AppRole[] = ["restaurant", "supplier", "serviceprovider", "jobseeker", "admin"];
