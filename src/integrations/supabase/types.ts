@@ -532,6 +532,33 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          billing_period: Database["public"]["Enums"]["subscription_billing"]
+          created_at: string
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_period?: Database["public"]["Enums"]["subscription_billing"]
+          created_at?: string
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_period?: Database["public"]["Enums"]["subscription_billing"]
+          created_at?: string
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       supplier_categories: {
         Row: {
           created_at: string
@@ -705,6 +732,8 @@ export type Database = {
       offer_type: "PRODUCT" | "SERVICE"
       rfq_status: "OPEN" | "CLOSED" | "AWARDED"
       rfq_type: "GOODS" | "SERVICES"
+      subscription_billing: "monthly" | "annual"
+      subscription_plan: "free" | "standard" | "premium"
       visibility_status: "PRIVATE" | "PUBLIC"
     }
     CompositeTypes: {
@@ -852,6 +881,8 @@ export const Constants = {
       offer_type: ["PRODUCT", "SERVICE"],
       rfq_status: ["OPEN", "CLOSED", "AWARDED"],
       rfq_type: ["GOODS", "SERVICES"],
+      subscription_billing: ["monthly", "annual"],
+      subscription_plan: ["free", "standard", "premium"],
       visibility_status: ["PRIVATE", "PUBLIC"],
     },
   },
