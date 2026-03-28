@@ -286,7 +286,7 @@ export default function AdminUsers() {
                 ))}
                 {filteredUsers.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
+                    <TableCell colSpan={5} className="text-center py-8">
                       <p className="text-muted-foreground">No users found</p>
                     </TableCell>
                   </TableRow>
