@@ -56,35 +56,34 @@ export default function AdminUsers() {
 
   const fetchUsers = async () => {
     try {
-      // Fetch profiles with their roles
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, created_at")
-        .order("created_at", { ascending: false });
+      const [profilesRes, rolesRes, subsRes] = await Promise.all([
+        supabase.from("profiles").select("user_id, full_name, created_at").order("created_at", { ascending: false }),
+        supabase.from("user_roles").select("user_id, role"),
+        supabase.from("subscriptions").select("user_id, plan, billing_period"),
+      ]);
 
-      if (profilesError) throw profilesError;
+      if (profilesRes.error) throw profilesRes.error;
+      if (rolesRes.error) throw rolesRes.error;
 
-      // Fetch all roles
-      const { data: roles, error: rolesError } = await supabase
-        .from("user_roles")
-        .select("user_id, role");
-
-      if (rolesError) throw rolesError;
-
-      // Group roles by user
-      const rolesByUser = (roles || []).reduce((acc, { user_id, role }) => {
+      const rolesByUser = (rolesRes.data || []).reduce((acc, { user_id, role }) => {
         if (!acc[user_id]) acc[user_id] = [];
         acc[user_id].push(role);
         return acc;
       }, {} as Record<string, AppRole[]>);
 
-      // Combine data
-      const usersData: UserWithRoles[] = (profiles || []).map((profile) => ({
+      const subsByUser = (subsRes.data || []).reduce((acc, { user_id, plan, billing_period }) => {
+        acc[user_id] = { plan, billing_period };
+        return acc;
+      }, {} as Record<string, { plan: string; billing_period: string }>);
+
+      const usersData: UserWithRoles[] = (profilesRes.data || []).map((profile) => ({
         id: profile.user_id,
-        email: "", // We don't have access to emails from profiles
+        email: "",
         full_name: profile.full_name,
         created_at: profile.created_at,
         roles: rolesByUser[profile.user_id] || [],
+        subscription_plan: subsByUser[profile.user_id]?.plan || null,
+        subscription_billing: subsByUser[profile.user_id]?.billing_period || null,
       }));
 
       setUsers(usersData);
@@ -211,6 +210,7 @@ export default function AdminUsers() {
                 <TableRow>
                   <TableHead>User</TableHead>
                   <TableHead>Roles</TableHead>
+                  <TableHead>Subscription</TableHead>
                   <TableHead>Joined</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -246,6 +246,27 @@ export default function AdminUsers() {
                           </span>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {user.subscription_plan ? (
+                        <div className="flex flex-col gap-0.5">
+                          <Badge
+                            variant="secondary"
+                            className={cn(
+                              user.subscription_plan === "premium" && "bg-amber-100 text-amber-800",
+                              user.subscription_plan === "standard" && "bg-blue-100 text-blue-800",
+                              user.subscription_plan === "free" && "bg-muted text-muted-foreground"
+                            )}
+                          >
+                            {user.subscription_plan}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground capitalize">
+                            {user.subscription_billing}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">None</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       {new Date(user.created_at).toLocaleDateString()}
