@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Building2, Truck, Briefcase, FileText, Users } from "lucide-react";
+import { Building2, Truck, Briefcase, FileText, Users, Home } from "lucide-react";
 
 interface DashboardStats {
   totalRestaurants: number;
