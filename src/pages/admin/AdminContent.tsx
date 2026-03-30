@@ -42,6 +42,16 @@ interface Post {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  category: string | null;
+  read_time: number | null;
+  is_featured: boolean | null;
+  tags: string[] | null;
+}
+
+interface KnowledgeCategory {
+  id: string;
+  name: string;
+  slug: string;
 }
 
 type PostStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";

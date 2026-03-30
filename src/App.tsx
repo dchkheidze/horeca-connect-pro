@@ -84,6 +84,9 @@ const App = () => (
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/knowledge" element={<KnowledgeCenterPage />} />
+              <Route path="/knowledge/:categorySlug" element={<KnowledgeCategoryPage />} />
+              <Route path="/knowledge/:categorySlug/:articleSlug" element={<KnowledgeArticlePage />} />
             </Route>
 
             {/* Auth routes (no layout) */}
