@@ -22,10 +22,14 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Search, UserCog } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Search, UserCog, CreditCard } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
+type SubPlan = Database["public"]["Enums"]["subscription_plan"];
+type SubBilling = Database["public"]["Enums"]["subscription_billing"];
 
 interface UserWithRoles {
   id: string;
