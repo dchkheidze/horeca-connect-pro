@@ -1,45 +1,83 @@
 
 
-# Add Unsplash Stock Photos Across the Site
+# Knowledge Center — Implementation Plan
 
 ## Overview
-Add hospitality-themed stock photos from Unsplash to the landing page, directory listing cards, and blog posts to make the site visually engaging.
+Build a structured Knowledge Center that replaces/supplements the existing Blog with a professional, Notion-style knowledge system. This is a significant feature with multiple new pages, a new database table for categories, and enhanced article structure.
 
-## Changes
+## Scope Review of the Prompt
 
-### 1. Landing Page Hero Section (`src/pages/LandingPage.tsx`)
-- Add a full-width background image behind the hero text (e.g., busy restaurant kitchen or elegant dining room)
-- Use an Unsplash URL with dark overlay for text readability
-- Add images to the "Why HoReCa Hub?" featured section (replace the gradient placeholder with a real photo)
+The prompt is well-structured and feasible. Here are my notes:
 
-### 2. Landing Page Role Cards (`src/pages/LandingPage.tsx`)
-- Add a small illustrative image or photo header to each role card (restaurant scene, delivery/supply chain, chef at work)
+**Fully implementable now:**
+- Knowledge Center landing page with category grid, featured articles, popular topic chips, latest articles list, and CTA section
+- Category page (filtered article list)
+- Enhanced article page with sidebar (related articles, marketplace links)
+- Search bar with filtering
+- All UI/layout requirements (Notion + Stripe Docs style, rounded cards, soft shadows, etc.)
 
-### 3. Supplier Directory Cards (`src/pages/SuppliersPage.tsx`)
-- Replace the `<Building2>` icon placeholder in the card header area with a relevant Unsplash stock photo (food supply, commercial kitchen equipment, etc.)
-- Use a default fallback image when no custom image exists
+**Adjustments needed:**
+- **Multi-language (EN/GEO/RU)**: This is a major feature on its own (i18n framework, translated content storage, language switcher). I recommend building the Knowledge Center first in English, then adding multi-language as a follow-up phase.
+- **AI recommendations**: Noted as "future" in the prompt — will prepare structure but not implement now.
+- **SEO optimization**: Can set up page titles/meta tags; full SSR-based SEO isn't possible with the current Vite SPA setup.
 
-### 4. Service Provider Directory Cards (`src/pages/ServiceProvidersPage.tsx`)
-- Same approach — replace the `<Wrench>` icon placeholder with a hospitality services stock photo
+## Database Changes
 
-### 5. Blog Post Thumbnails (`src/pages/BlogPage.tsx`)
-- Add a placeholder thumbnail image to each blog post card using a generic hospitality/food photo
-- Show it in the card header area above the title
+### 1. New table: `knowledge_categories`
+Stores the 10 predefined categories with icon names, descriptions, and sort order.
 
-### 6. Blog Post Detail (`src/pages/BlogPostPage.tsx`)
-- Add a hero/banner image at the top of the post detail page
+### 2. Modify `posts` table
+Add columns:
+- `category` (text) — links to a knowledge category slug
+- `read_time` (integer) — estimated read time in minutes
+- `is_featured` (boolean, default false) — marks featured articles
+- `tags` (text array) — for popular topic filtering
 
-## Technical Approach
-- Use Unsplash source URLs (e.g., `https://images.unsplash.com/photo-XXXXX?w=800&q=80`) — no API key needed
-- Define a set of ~8-10 curated hospitality photo URLs as constants
-- For directory cards without custom images, rotate through these photos deterministically (based on item index or id hash)
-- Use `object-cover` CSS for consistent aspect ratios
-- Add `loading="lazy"` for performance
+## New Pages & Routes
 
-## Files to Edit
-- `src/pages/LandingPage.tsx` — hero bg image, role card images, featured section image
-- `src/pages/SuppliersPage.tsx` — card thumbnail images
-- `src/pages/ServiceProvidersPage.tsx` — card thumbnail images
-- `src/pages/BlogPage.tsx` — post card thumbnails
-- `src/pages/BlogPostPage.tsx` — post hero image
+| Route | Page | Description |
+|-------|------|-------------|
+| `/knowledge` | KnowledgeCenterPage | Main landing with category grid, featured, popular topics, latest, CTA |
+| `/knowledge/:categorySlug` | KnowledgeCategoryPage | Category page with filtered article list and sort options |
+| `/knowledge/:categorySlug/:articleSlug` | KnowledgeArticlePage | Article with sidebar (related articles, marketplace links) |
+
+## Page Breakdown
+
+### KnowledgeCenterPage
+1. **Header**: Title, subtitle, search bar with category chip filters
+2. **Category Grid**: 3-column grid of category cards (icon, title, description, article count) — "Coming soon" badge for empty categories
+3. **Featured Insights**: 3-4 large cards for featured articles with images, excerpt, category tag, read time
+4. **Popular Topics**: Clickable tag chips that filter content
+5. **Latest Articles**: Compact list format (title, category, excerpt, date)
+6. **CTA Block**: "Browse Marketplace" linking to `/suppliers`
+
+### KnowledgeCategoryPage
+- Category header with description and article count
+- Article list with sort options (popular, newest, guides/case studies)
+
+### KnowledgeArticlePage
+- Article content with structured headings
+- Sidebar: related articles, links to suppliers/service providers directory
+
+## Navigation
+- Replace "Blog" nav link with "Knowledge Center" pointing to `/knowledge`
+- Keep existing `/blog` routes working (redirect or keep as-is)
+
+## Files to Create/Edit
+- **Create**: `src/pages/KnowledgeCenterPage.tsx`, `src/pages/KnowledgeCategoryPage.tsx`, `src/pages/KnowledgeArticlePage.tsx`
+- **Edit**: `src/App.tsx` (add routes), `src/components/layout/PublicNav.tsx` (update nav link)
+- **Create**: Migration for `knowledge_categories` table and `posts` table additions
+- **Edit**: Admin content page to support new fields (category, read_time, featured, tags)
+
+## Design Style
+- White background with light grey sections
+- Minimal color usage (primary brand color only)
+- Rounded cards with soft shadows
+- Clean typography using existing Outfit/DM Sans fonts
+- Line icons from Lucide
+
+## What I Recommend Deferring
+- **Multi-language support** — build as a separate phase after the Knowledge Center structure is solid
+- **AI recommendations** — structural prep only
+- **Full SEO** — limited by SPA architecture; will add document titles
 
