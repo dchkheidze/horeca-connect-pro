@@ -47,6 +47,7 @@ interface Post {
   read_time: number | null;
   is_featured: boolean | null;
   tags: string[] | null;
+  cover_image: string | null;
 }
 
 interface KnowledgeCategory {
