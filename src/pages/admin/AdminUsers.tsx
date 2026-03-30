@@ -37,13 +37,14 @@ interface UserWithRoles {
   subscription_billing: string | null;
 }
 
-const ALL_ROLES: AppRole[] = ["restaurant", "supplier", "serviceprovider", "jobseeker", "admin"];
+const ALL_ROLES: AppRole[] = ["restaurant", "supplier", "serviceprovider", "jobseeker", "realestate", "admin"];
 
 const roleColors: Record<AppRole, string> = {
   restaurant: "bg-primary/10 text-primary",
   supplier: "bg-supplier/10 text-supplier",
   serviceprovider: "bg-accent/10 text-accent-foreground",
   jobseeker: "bg-jobseeker/10 text-jobseeker",
+  realestate: "bg-amber-100 text-amber-800",
   admin: "bg-destructive/10 text-destructive",
 };
 
