@@ -25,6 +25,9 @@ import JobDetailPage from "@/pages/JobDetailPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
 import PricingPage from "@/pages/PricingPage";
+import KnowledgeCenterPage from "@/pages/KnowledgeCenterPage";
+import KnowledgeCategoryPage from "@/pages/KnowledgeCategoryPage";
+import KnowledgeArticlePage from "@/pages/KnowledgeArticlePage";
 
 // Auth Pages
 import LoginPage from "@/pages/auth/LoginPage";
@@ -81,6 +84,9 @@ const App = () => (
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/knowledge" element={<KnowledgeCenterPage />} />
+              <Route path="/knowledge/:categorySlug" element={<KnowledgeCategoryPage />} />
+              <Route path="/knowledge/:categorySlug/:articleSlug" element={<KnowledgeArticlePage />} />
             </Route>
 
             {/* Auth routes (no layout) */}

@@ -222,40 +222,82 @@ export type Database = {
           },
         ]
       }
+      knowledge_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon_name: string
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon_name?: string
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon_name?: string
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_id: string | null
+          category: string | null
           content: string | null
           created_at: string
           excerpt: string | null
           id: string
+          is_featured: boolean | null
           published_at: string | null
+          read_time: number | null
           slug: string
           status: string
+          tags: string[] | null
           title: string
           updated_at: string
         }
         Insert: {
           author_id?: string | null
+          category?: string | null
           content?: string | null
           created_at?: string
           excerpt?: string | null
           id?: string
+          is_featured?: boolean | null
           published_at?: string | null
+          read_time?: number | null
           slug: string
           status?: string
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
         Update: {
           author_id?: string | null
+          category?: string | null
           content?: string | null
           created_at?: string
           excerpt?: string | null
           id?: string
+          is_featured?: boolean | null
           published_at?: string | null
+          read_time?: number | null
           slug?: string
           status?: string
+          tags?: string[] | null
           title?: string
           updated_at?: string
         }

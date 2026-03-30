@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, FileText } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Post {
@@ -42,6 +43,16 @@ interface Post {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  category: string | null;
+  read_time: number | null;
+  is_featured: boolean | null;
+  tags: string[] | null;
+}
+
+interface KnowledgeCategory {
+  id: string;
+  name: string;
+  slug: string;
 }
 
 type PostStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
@@ -49,6 +60,7 @@ type PostStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 export default function AdminContent() {
   const { user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [knowledgeCategories, setKnowledgeCategories] = useState<KnowledgeCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
@@ -60,17 +72,22 @@ export default function AdminContent() {
     excerpt: "",
     content: "",
     status: "DRAFT" as PostStatus,
+    category: "",
+    read_time: 5,
+    is_featured: false,
+    tags: "",
   });
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const [postsRes, catsRes] = await Promise.all([
+        supabase.from("posts").select("*").order("created_at", { ascending: false }),
+        supabase.from("knowledge_categories").select("id, name, slug").order("sort_order"),
+      ]);
 
-      if (error) throw error;
-      setPosts(data || []);
+      if (postsRes.error) throw postsRes.error;
+      setPosts(postsRes.data || []);
+      setKnowledgeCategories((catsRes.data || []) as KnowledgeCategory[]);
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast.error("Failed to load posts");
@@ -106,6 +123,10 @@ export default function AdminContent() {
       excerpt: "",
       content: "",
       status: "DRAFT",
+      category: "",
+      read_time: 5,
+      is_featured: false,
+      tags: "",
     });
     setDialogOpen(true);
   };
@@ -118,6 +139,10 @@ export default function AdminContent() {
       excerpt: post.excerpt || "",
       content: post.content || "",
       status: post.status as PostStatus,
+      category: post.category || "",
+      read_time: post.read_time || 5,
+      is_featured: post.is_featured || false,
+      tags: (post.tags || []).join(", "),
     });
     setDialogOpen(true);
   };
@@ -139,6 +164,12 @@ export default function AdminContent() {
         status: formData.status,
         published_at: formData.status === "PUBLISHED" ? new Date().toISOString() : null,
         author_id: user?.id,
+        category: formData.category || null,
+        read_time: formData.read_time,
+        is_featured: formData.is_featured,
+        tags: formData.tags
+          ? formData.tags.split(",").map((t) => t.trim()).filter(Boolean)
+          : [],
       };
 
       if (editingPost) {
@@ -355,6 +386,71 @@ export default function AdminContent() {
                   <SelectItem value="ARCHIVED">Archived</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            {/* New Knowledge Center fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, category: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">None</SelectItem>
+                    {knowledgeCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.slug}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="read_time">Read Time (min)</Label>
+                <Input
+                  id="read_time"
+                  type="number"
+                  min={1}
+                  value={formData.read_time}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      read_time: parseInt(e.target.value) || 5,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags (comma-separated)</Label>
+              <Input
+                id="tags"
+                value={formData.tags}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, tags: e.target.value }))
+                }
+                placeholder="e.g. Food Cost, Hiring, Marketing"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="is_featured"
+                checked={formData.is_featured}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    is_featured: checked === true,
+                  }))
+                }
+              />
+              <Label htmlFor="is_featured" className="cursor-pointer">
+                Featured article
+              </Label>
             </div>
           </div>
           <DialogFooter>
