@@ -478,6 +478,65 @@ export default function AdminContent() {
                 placeholder="e.g. Food Cost, Hiring, Marketing"
               />
             </div>
+            {/* Cover Image */}
+            <div className="space-y-2">
+              <Label>Cover Image</Label>
+              {formData.cover_image && (
+                <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden border bg-muted mb-2">
+                  <img
+                    src={formData.cover_image}
+                    alt="Cover preview"
+                    className="h-full w-full object-cover"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-7 w-7"
+                    onClick={() => setFormData((prev) => ({ ...prev, cover_image: "" }))}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <Tabs defaultValue="upload" className="w-full">
+                <TabsList className="w-full">
+                  <TabsTrigger value="upload" className="flex-1">
+                    <Upload className="h-4 w-4 mr-1" /> Upload
+                  </TabsTrigger>
+                  <TabsTrigger value="url" className="flex-1">
+                    <Link2 className="h-4 w-4 mr-1" /> URL
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="upload">
+                  <div className="flex items-center gap-2">
+                    <label className="flex-1 cursor-pointer">
+                      <div className="flex items-center justify-center gap-2 p-3 border-2 border-dashed rounded-lg text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                        <Image className="h-4 w-4" />
+                        {uploading ? "Uploading..." : "Click to select image"}
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                        disabled={uploading}
+                      />
+                    </label>
+                  </div>
+                </TabsContent>
+                <TabsContent value="url">
+                  <Input
+                    placeholder="https://example.com/image.jpg"
+                    value={formData.cover_image}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, cover_image: e.target.value }))
+                    }
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
+
             <div className="flex items-center gap-2">
               <Checkbox
                 id="is_featured"
