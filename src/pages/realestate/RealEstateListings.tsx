@@ -85,6 +85,12 @@ export default function RealEstateListings() {
     fetchProperties();
   }, [user]);
 
+  useEffect(() => {
+    if (searchParams.get("new") === "1" && !loading) {
+      openCreate();
+      setSearchParams({}, { replace: true });
+    }
+  }, [loading, searchParams]);
   const generateSlug = (title: string) =>
     title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
