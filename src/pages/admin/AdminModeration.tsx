@@ -110,6 +110,23 @@ export default function AdminModeration() {
     }
   };
 
+  const togglePropertyPublished = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("properties")
+        .update({ is_published: !currentStatus })
+        .eq("id", id);
+      if (error) throw error;
+      setProperties((prev: any[]) =>
+        prev.map((p: any) => (p.id === id ? { ...p, is_published: !currentStatus } : p))
+      );
+      toast.success(`Property ${!currentStatus ? "published" : "unpublished"}`);
+    } catch (error) {
+      console.error("Error updating property:", error);
+      toast.error("Failed to update property");
+    }
+  };
+
   const getJobStatusBadge = (status: string | null) => {
     switch (status) {
       case "PUBLISHED":
