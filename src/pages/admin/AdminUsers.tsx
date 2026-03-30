@@ -389,6 +389,53 @@ export default function AdminUsers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Edit Subscription Dialog */}
+      <Dialog open={!!editingSub} onOpenChange={() => setEditingSub(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Edit Subscription for {editingSub?.full_name || "User"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Plan</Label>
+              <RadioGroup value={selectedPlan} onValueChange={(v) => setSelectedPlan(v as SubPlan)}>
+                {(["free", "standard", "premium"] as SubPlan[]).map((plan) => (
+                  <label key={plan} className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-secondary transition-colors">
+                    <RadioGroupItem value={plan} />
+                    <div>
+                      <p className="font-medium capitalize">{plan}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {plan === "free" && "Basic access, no premium features"}
+                        {plan === "standard" && "90 GEL/month — access to property listings"}
+                        {plan === "premium" && "150 GEL/month — full platform access"}
+                      </p>
+                    </div>
+                  </label>
+                ))}
+              </RadioGroup>
+            </div>
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Billing Period</Label>
+              <RadioGroup value={selectedBilling} onValueChange={(v) => setSelectedBilling(v as SubBilling)}>
+                {(["monthly", "annual"] as SubBilling[]).map((period) => (
+                  <label key={period} className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-secondary transition-colors">
+                    <RadioGroupItem value={period} />
+                    <p className="font-medium capitalize">{period}</p>
+                  </label>
+                ))}
+              </RadioGroup>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingSub(null)}>Cancel</Button>
+            <Button onClick={handleSaveSub} disabled={savingSub}>
+              {savingSub ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
