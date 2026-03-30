@@ -75,6 +75,13 @@ export default function OnboardingPage() {
             .eq("user_id", user.id)
             .maybeSingle();
           exists = !!data;
+        } else if (r === "realestate") {
+          const { data } = await supabase
+            .from("real_estate_agents")
+            .select("id")
+            .eq("owner_user_id", user.id)
+            .maybeSingle();
+          exists = !!data;
         }
 
         if (!exists) missing.push(r);
