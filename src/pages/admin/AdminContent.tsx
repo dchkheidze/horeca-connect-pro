@@ -387,7 +387,71 @@ export default function AdminContent() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+            {/* New Knowledge Center fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, category: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">None</SelectItem>
+                    {knowledgeCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.slug}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="read_time">Read Time (min)</Label>
+                <Input
+                  id="read_time"
+                  type="number"
+                  min={1}
+                  value={formData.read_time}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      read_time: parseInt(e.target.value) || 5,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags (comma-separated)</Label>
+              <Input
+                id="tags"
+                value={formData.tags}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, tags: e.target.value }))
+                }
+                placeholder="e.g. Food Cost, Hiring, Marketing"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="is_featured"
+                checked={formData.is_featured}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    is_featured: checked === true,
+                  }))
+                }
+              />
+              <Label htmlFor="is_featured" className="cursor-pointer">
+                Featured article
+              </Label>
+            </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
