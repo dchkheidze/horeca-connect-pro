@@ -1,44 +1,31 @@
 
 
-# Fix Subscription Editing in Admin Users
+# Add "New Listing" Button to Real Estate Dashboard
 
 ## Problem
-Two bugs:
-1. **Fetch bug**: `subsRes.error` is never checked/thrown (line 76 checks rolesRes but skips subsRes), so subscription data silently fails to load — hence "None" for everyone.
-2. **Save bug**: `handleSaveSub` uses `.update()` which does nothing if no subscription row exists for a user. Need to use `.upsert()` instead.
+The Real Estate Dashboard (`src/pages/dashboards/RealEstateDashboard.tsx`) has a "Manage Listings" button but no direct "Add New Listing" button. Agents need a quick way to create a new property.
 
-## Fix — `src/pages/admin/AdminUsers.tsx`
+## Fix — `src/pages/dashboards/RealEstateDashboard.tsx`
 
-### 1. Add error check for subscriptions fetch (after line 76)
-```typescript
-if (subsRes.error) throw subsRes.error;
-```
+In the Quick Actions card (line ~89), add a "New Listing" button that opens the listings page. Since the create dialog lives in `RealEstateListings.tsx`, the simplest approach is to link to `/re/listings` with a query param `?new=1` and update `RealEstateListings.tsx` to auto-open the create dialog when that param is present.
 
-### 2. Change `handleSaveSub` from `.update()` to `.upsert()`
-Replace:
-```typescript
-const { error } = await supabase
-  .from("subscriptions")
-  .update({ plan: selectedPlan, billing_period: selectedBilling })
-  .eq("user_id", editingSub.id);
-```
-With:
-```typescript
-const { error } = await supabase
-  .from("subscriptions")
-  .upsert(
-    { user_id: editingSub.id, plan: selectedPlan, billing_period: selectedBilling },
-    { onConflict: "user_id" }
-  );
-```
+### Changes:
+1. **`src/pages/dashboards/RealEstateDashboard.tsx`** — Add a prominent "Add New Listing" button in Quick Actions:
+   ```tsx
+   <Button asChild>
+     <Link to="/re/listings?new=1">
+       <Plus className="h-4 w-4 mr-2" /> Add New Listing
+     </Link>
+   </Button>
+   ```
 
-This requires a unique constraint on `subscriptions.user_id`. Need to check if one exists — if not, add a migration for it.
+2. **`src/pages/realestate/RealEstateListings.tsx`** — Read `?new=1` from URL search params and auto-open the create dialog on mount:
+   ```tsx
+   const [searchParams] = useSearchParams();
+   useEffect(() => {
+     if (searchParams.get("new") === "1") openCreate();
+   }, []);
+   ```
 
-### 3. Database migration (if needed)
-Add unique constraint on `subscriptions.user_id`:
-```sql
-ALTER TABLE public.subscriptions ADD CONSTRAINT subscriptions_user_id_key UNIQUE (user_id);
-```
-
-One file edit, one possible migration. Minimal change.
+Two files, minimal changes.
 
