@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Building2, Truck, Briefcase, FileText, Users } from "lucide-react";
+import { Building2, Truck, Briefcase, FileText, Users, Home } from "lucide-react";
 
 interface DashboardStats {
   totalRestaurants: number;
   totalSuppliers: number;
   totalJobs: number;
   totalApplications: number;
+  totalProperties: number;
   newUsersLast7Days: number;
 }
 
@@ -17,6 +18,7 @@ export default function AdminDashboard() {
     totalSuppliers: 0,
     totalJobs: 0,
     totalApplications: 0,
+    totalProperties: 0,
     newUsersLast7Days: 0,
   });
   const [loading, setLoading] = useState(true);
@@ -29,12 +31,14 @@ export default function AdminDashboard() {
           suppliersResult,
           jobsResult,
           applicationsResult,
+          propertiesResult,
           usersResult,
         ] = await Promise.all([
           supabase.from("restaurants").select("id", { count: "exact", head: true }),
           supabase.from("suppliers").select("id", { count: "exact", head: true }),
           supabase.from("jobs").select("id", { count: "exact", head: true }),
           supabase.from("job_applications").select("id", { count: "exact", head: true }),
+          supabase.from("properties").select("id", { count: "exact", head: true }),
           supabase
             .from("profiles")
             .select("id", { count: "exact", head: true })
@@ -46,6 +50,7 @@ export default function AdminDashboard() {
           totalSuppliers: suppliersResult.count || 0,
           totalJobs: jobsResult.count || 0,
           totalApplications: applicationsResult.count || 0,
+          totalProperties: propertiesResult.count || 0,
           newUsersLast7Days: usersResult.count || 0,
         });
       } catch (error) {
@@ -93,6 +98,13 @@ export default function AdminDashboard() {
       icon: Users,
       color: "text-green-600",
       bgColor: "bg-green-100",
+    },
+    {
+      title: "Properties",
+      value: stats.totalProperties,
+      icon: Home,
+      color: "text-amber-600",
+      bgColor: "bg-amber-100",
     },
   ];
 

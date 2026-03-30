@@ -6,6 +6,7 @@ import { RestaurantOnboarding } from "@/components/onboarding/RestaurantOnboardi
 import { SupplierOnboarding } from "@/components/onboarding/SupplierOnboarding";
 import { ServiceProviderOnboarding } from "@/components/onboarding/ServiceProviderOnboarding";
 import { JobSeekerOnboarding } from "@/components/onboarding/JobSeekerOnboarding";
+import { RealEstateOnboarding } from "@/components/onboarding/RealEstateOnboarding";
 
 export default function OnboardingPage() {
   const { user, roles, loading: authLoading } = useAuth();
@@ -74,6 +75,13 @@ export default function OnboardingPage() {
             .eq("user_id", user.id)
             .maybeSingle();
           exists = !!data;
+        } else if (r === "realestate") {
+          const { data } = await supabase
+            .from("real_estate_agents")
+            .select("id")
+            .eq("owner_user_id", user.id)
+            .maybeSingle();
+          exists = !!data;
         }
 
         if (!exists) missing.push(r);
@@ -87,6 +95,7 @@ export default function OnboardingPage() {
           supplier: "/s/dashboard",
           serviceprovider: "/sp/dashboard",
           jobseeker: "/j/dashboard",
+          realestate: "/re/dashboard",
         };
         navigate(roleRedirects[primaryRole] || "/dashboard", { replace: true });
         return;
@@ -110,6 +119,7 @@ export default function OnboardingPage() {
         supplier: "/s/dashboard",
         serviceprovider: "/sp/dashboard",
         jobseeker: "/j/dashboard",
+        realestate: "/re/dashboard",
       };
       navigate(roleRedirects[primaryRole] || "/dashboard", { replace: true });
     } else {
@@ -135,6 +145,7 @@ export default function OnboardingPage() {
     supplier: "Supplier",
     serviceprovider: "Service Provider",
     jobseeker: "Job Seeker",
+    realestate: "Real Estate Agent",
   };
 
   return (
@@ -173,6 +184,10 @@ export default function OnboardingPage() {
             fullName={fullName}
             onComplete={handleStepComplete}
           />
+        )}
+
+        {currentRole === "realestate" && (
+          <RealEstateOnboarding userId={user.id} onComplete={handleStepComplete} />
         )}
       </div>
     </div>

@@ -10,13 +10,13 @@ import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
-type RoleOption = "restaurant" | "supplier" | "serviceprovider" | "supplier_serviceprovider" | "jobseeker";
+type RoleOption = "restaurant" | "supplier" | "serviceprovider" | "supplier_serviceprovider" | "jobseeker" | "realestate";
 
 const registerSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
   email: z.string().trim().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  roleOption: z.enum(["restaurant", "supplier", "serviceprovider", "supplier_serviceprovider", "jobseeker"], { required_error: "Please select an account type" }),
+  roleOption: z.enum(["restaurant", "supplier", "serviceprovider", "supplier_serviceprovider", "jobseeker", "realestate"], { required_error: "Please select an account type" }),
 });
 
 const roleOptionLabels: Record<RoleOption, string> = {
@@ -25,6 +25,7 @@ const roleOptionLabels: Record<RoleOption, string> = {
   serviceprovider: "Service provider",
   supplier_serviceprovider: "Supplier & Service provider",
   jobseeker: "Job seeker",
+  realestate: "Real estate agent",
 };
 
 function roleOptionToRoles(option: RoleOption): AppRole[] {
@@ -187,6 +188,7 @@ export default function RegisterPage() {
                     <SelectItem value="serviceprovider">{roleOptionLabels.serviceprovider}</SelectItem>
                     <SelectItem value="supplier_serviceprovider">{roleOptionLabels.supplier_serviceprovider}</SelectItem>
                     <SelectItem value="jobseeker">{roleOptionLabels.jobseeker}</SelectItem>
+                    <SelectItem value="realestate">{roleOptionLabels.realestate}</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.roleOption && <p className="text-sm text-destructive">{errors.roleOption}</p>}

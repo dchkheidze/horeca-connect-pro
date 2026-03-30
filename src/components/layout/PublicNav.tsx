@@ -9,6 +9,7 @@ const navLinks = [
   { href: "/suppliers", label: "Suppliers" },
   { href: "/service-providers", label: "Service Providers" },
   { href: "/jobs", label: "Jobs" },
+  { href: "/properties", label: "Properties" },
   { href: "/pricing", label: "Pricing" },
   { href: "/knowledge", label: "Knowledge Center" },
 ];
@@ -26,6 +27,7 @@ export function PublicNav() {
       supplier: "/s/dashboard",
       serviceprovider: "/sp/dashboard",
       jobseeker: "/j/dashboard",
+      realestate: "/re/dashboard",
     };
     return roleLinks[role] || "/dashboard";
   };

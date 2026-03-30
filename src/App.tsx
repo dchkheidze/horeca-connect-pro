@@ -52,6 +52,11 @@ import ServiceProviderRFQs from "@/pages/serviceprovider/ServiceProviderRFQs";
 import JobSeekerDashboard from "@/pages/dashboards/JobSeekerDashboard";
 import JobSeekerProfile from "@/pages/jobseeker/JobSeekerProfile";
 import JobSeekerApplications from "@/pages/jobseeker/JobSeekerApplications";
+import RealEstateDashboard from "@/pages/dashboards/RealEstateDashboard";
+import RealEstateListings from "@/pages/realestate/RealEstateListings";
+import RealEstateProfileEdit from "@/pages/realestate/RealEstateProfileEdit";
+import PropertiesPage from "@/pages/PropertiesPage";
+import PropertyDetailPage from "@/pages/PropertyDetailPage";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -87,6 +92,8 @@ const App = () => (
               <Route path="/knowledge" element={<KnowledgeCenterPage />} />
               <Route path="/knowledge/:categorySlug" element={<KnowledgeCategoryPage />} />
               <Route path="/knowledge/:categorySlug/:articleSlug" element={<KnowledgeArticlePage />} />
+              <Route path="/properties" element={<PropertiesPage />} />
+              <Route path="/properties/:slug" element={<PropertyDetailPage />} />
             </Route>
 
             {/* Auth routes (no layout) */}
@@ -157,6 +164,20 @@ const App = () => (
               <Route path="applications" element={<JobSeekerApplications />} />
               <Route path="profile" element={<JobSeekerProfile />} />
               <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
+            </Route>
+
+            {/* Real Estate dashboard routes (protected) */}
+            <Route
+              path="/re"
+              element={
+                <ProtectedRoute allowedRoles={["realestate"]}>
+                  <DashboardLayout role="realestate" />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="dashboard" element={<RealEstateDashboard />} />
+              <Route path="listings" element={<RealEstateListings />} />
+              <Route path="settings" element={<RealEstateProfileEdit />} />
             </Route>
 
             {/* Admin routes (protected - admin only) */}

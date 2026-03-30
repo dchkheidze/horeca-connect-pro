@@ -10,13 +10,14 @@ import {
   Menu,
   Package,
   Wrench,
-  FileText
+  FileText,
+  Home
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardLayoutProps {
-  role: "restaurant" | "supplier" | "jobseeker" | "serviceprovider";
+  role: "restaurant" | "supplier" | "jobseeker" | "serviceprovider" | "realestate";
 }
 
 const roleConfig = {
@@ -66,6 +67,16 @@ const roleConfig = {
       { icon: Briefcase, label: "Applications", href: "/j/applications" },
       { icon: Users, label: "Profile", href: "/j/profile" },
       { icon: Settings, label: "Settings", href: "/j/settings" },
+    ],
+  },
+  realestate: {
+    title: "Real Estate Portal",
+    prefix: "/re",
+    color: "bg-amber-600",
+    navItems: [
+      { icon: LayoutDashboard, label: "Dashboard", href: "/re/dashboard" },
+      { icon: Home, label: "Listings", href: "/re/listings" },
+      { icon: Settings, label: "Settings", href: "/re/settings" },
     ],
   },
 };

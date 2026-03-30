@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Building2, Truck, Briefcase, ExternalLink } from "lucide-react";
+import { Building2, Truck, Briefcase, ExternalLink, Home } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type Restaurant = Database["public"]["Tables"]["restaurants"]["Row"];
@@ -25,19 +25,22 @@ export default function AdminModeration() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
-      const [restaurantsRes, suppliersRes, jobsRes] = await Promise.all([
+      const [restaurantsRes, suppliersRes, jobsRes, propertiesRes] = await Promise.all([
         supabase.from("restaurants").select("*").order("created_at", { ascending: false }),
         supabase.from("suppliers").select("*").order("created_at", { ascending: false }),
         supabase.from("jobs").select("*").order("created_at", { ascending: false }),
+        supabase.from("properties").select("*").order("created_at", { ascending: false }),
       ]);
 
       if (restaurantsRes.data) setRestaurants(restaurantsRes.data);
       if (suppliersRes.data) setSuppliers(suppliersRes.data);
       if (jobsRes.data) setJobs(jobsRes.data);
+      if (propertiesRes.data) setProperties(propertiesRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to load moderation data");
@@ -107,6 +110,23 @@ export default function AdminModeration() {
     }
   };
 
+  const togglePropertyPublished = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("properties")
+        .update({ is_published: !currentStatus })
+        .eq("id", id);
+      if (error) throw error;
+      setProperties((prev: any[]) =>
+        prev.map((p: any) => (p.id === id ? { ...p, is_published: !currentStatus } : p))
+      );
+      toast.success(`Property ${!currentStatus ? "published" : "unpublished"}`);
+    } catch (error) {
+      console.error("Error updating property:", error);
+      toast.error("Failed to update property");
+    }
+  };
+
   const getJobStatusBadge = (status: string | null) => {
     switch (status) {
       case "PUBLISHED":
@@ -130,7 +150,7 @@ export default function AdminModeration() {
       </div>
 
       <Tabs defaultValue="restaurants">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="restaurants" className="gap-2">
             <Building2 className="h-4 w-4" />
             Restaurants ({restaurants.length})
@@ -142,6 +162,10 @@ export default function AdminModeration() {
           <TabsTrigger value="jobs" className="gap-2">
             <Briefcase className="h-4 w-4" />
             Jobs ({jobs.length})
+          </TabsTrigger>
+          <TabsTrigger value="properties" className="gap-2">
+            <Home className="h-4 w-4" />
+            Properties ({properties.length})
           </TabsTrigger>
         </TabsList>
 
@@ -380,6 +404,64 @@ export default function AdminModeration() {
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-8">
                           <p className="text-muted-foreground">No jobs found</p>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="properties" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Property Listings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-12 animate-pulse bg-muted rounded" />
+                  ))}
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Listing</TableHead>
+                      <TableHead>City</TableHead>
+                      <TableHead>Published</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {properties.map((p: any) => (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-medium">{p.title}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">{p.property_type}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={p.listing_type === "SALE" ? "default" : "secondary"}>
+                            {p.listing_type === "SALE" ? "For Sale" : "For Rent"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{p.city || "-"}</TableCell>
+                        <TableCell>
+                          <Switch
+                            checked={p.is_published || false}
+                            onCheckedChange={() => togglePropertyPublished(p.id, p.is_published || false)}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {properties.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8">
+                          <p className="text-muted-foreground">No properties found</p>
                         </TableCell>
                       </TableRow>
                     )}

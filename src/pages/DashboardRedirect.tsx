@@ -36,6 +36,9 @@ export default function DashboardRedirect() {
         } else if (r === "jobseeker") {
           const { data } = await supabase.from("job_seekers").select("id").eq("user_id", user.id).maybeSingle();
           exists = !!data;
+        } else if (r === "realestate") {
+          const { data } = await supabase.from("real_estate_agents").select("id").eq("owner_user_id", user.id).maybeSingle();
+          exists = !!data;
         }
         if (!exists) {
           anyMissing = true;
@@ -53,6 +56,7 @@ export default function DashboardRedirect() {
         supplier: "/s/dashboard",
         serviceprovider: "/sp/dashboard",
         jobseeker: "/j/dashboard",
+        realestate: "/re/dashboard",
         admin: "/admin/dashboard",
       };
       navigate(roleRedirects[role] || "/dashboard", { replace: true });
