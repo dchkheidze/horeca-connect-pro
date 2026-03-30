@@ -6,6 +6,7 @@ import { RestaurantOnboarding } from "@/components/onboarding/RestaurantOnboardi
 import { SupplierOnboarding } from "@/components/onboarding/SupplierOnboarding";
 import { ServiceProviderOnboarding } from "@/components/onboarding/ServiceProviderOnboarding";
 import { JobSeekerOnboarding } from "@/components/onboarding/JobSeekerOnboarding";
+import { RealEstateOnboarding } from "@/components/onboarding/RealEstateOnboarding";
 
 export default function OnboardingPage() {
   const { user, roles, loading: authLoading } = useAuth();
