@@ -133,16 +133,14 @@ export default function PricingPage() {
                   <CardContent className="space-y-6">
                     <div>
                       <span className="font-heading text-4xl font-bold">
-                        {price === 0 ? "Free" : `${price} ₾`}
+                        {price === 0 ? "Free" : `${billingPeriod === "annual" && plan.monthlyPrice > 0 ? Math.round(plan.annualPrice / 12) : price} ₾`}
                       </span>
-                      {price > 0 && (
-                        <span className="text-muted-foreground text-sm ml-1">
-                          / {billingPeriod === "annual" ? "year" : "month"}
-                        </span>
+                      {plan.monthlyPrice > 0 && (
+                        <span className="text-muted-foreground text-sm ml-1">/ month</span>
                       )}
-                      {billingPeriod === "annual" && price > 0 && (
+                      {billingPeriod === "annual" && plan.monthlyPrice > 0 && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          That's {Math.round(price / 12)} ₾/month
+                          {plan.annualPrice} ₾ billed annually
                         </p>
                       )}
                     </div>
