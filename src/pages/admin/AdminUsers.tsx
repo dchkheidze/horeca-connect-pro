@@ -22,10 +22,14 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Search, UserCog } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Search, UserCog, CreditCard } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
+type SubPlan = Database["public"]["Enums"]["subscription_plan"];
+type SubBilling = Database["public"]["Enums"]["subscription_billing"];
 
 interface UserWithRoles {
   id: string;
@@ -55,6 +59,10 @@ export default function AdminUsers() {
   const [editingUser, setEditingUser] = useState<UserWithRoles | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
   const [saving, setSaving] = useState(false);
+  const [editingSub, setEditingSub] = useState<UserWithRoles | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<SubPlan>("free");
+  const [selectedBilling, setSelectedBilling] = useState<SubBilling>("monthly");
+  const [savingSub, setSavingSub] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -171,6 +179,32 @@ export default function AdminUsers() {
     }
   };
 
+  const handleEditSub = (user: UserWithRoles) => {
+    setEditingSub(user);
+    setSelectedPlan((user.subscription_plan as SubPlan) || "free");
+    setSelectedBilling((user.subscription_billing as SubBilling) || "monthly");
+  };
+
+  const handleSaveSub = async () => {
+    if (!editingSub) return;
+    setSavingSub(true);
+    try {
+      const { error } = await supabase
+        .from("subscriptions")
+        .update({ plan: selectedPlan, billing_period: selectedBilling })
+        .eq("user_id", editingSub.id);
+      if (error) throw error;
+      toast.success("Subscription updated successfully");
+      setEditingSub(null);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+      toast.error("Failed to update subscription");
+    } finally {
+      setSavingSub(false);
+    }
+  };
+
   const filteredUsers = users.filter(
     (user) =>
       user.full_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -274,14 +308,24 @@ export default function AdminUsers() {
                       {new Date(user.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditRoles(user)}
-                      >
-                        <UserCog className="h-4 w-4 mr-1" />
-                        Edit Roles
-                      </Button>
+                      <div className="flex gap-1 justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditRoles(user)}
+                        >
+                          <UserCog className="h-4 w-4 mr-1" />
+                          Roles
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditSub(user)}
+                        >
+                          <CreditCard className="h-4 w-4 mr-1" />
+                          Sub
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -341,6 +385,53 @@ export default function AdminUsers() {
             </Button>
             <Button onClick={handleSaveRoles} disabled={saving}>
               {saving ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Edit Subscription Dialog */}
+      <Dialog open={!!editingSub} onOpenChange={() => setEditingSub(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Edit Subscription for {editingSub?.full_name || "User"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Plan</Label>
+              <RadioGroup value={selectedPlan} onValueChange={(v) => setSelectedPlan(v as SubPlan)}>
+                {(["free", "standard", "premium"] as SubPlan[]).map((plan) => (
+                  <label key={plan} className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-secondary transition-colors">
+                    <RadioGroupItem value={plan} />
+                    <div>
+                      <p className="font-medium capitalize">{plan}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {plan === "free" && "Basic access, no premium features"}
+                        {plan === "standard" && "90 GEL/month — access to property listings"}
+                        {plan === "premium" && "150 GEL/month — full platform access"}
+                      </p>
+                    </div>
+                  </label>
+                ))}
+              </RadioGroup>
+            </div>
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Billing Period</Label>
+              <RadioGroup value={selectedBilling} onValueChange={(v) => setSelectedBilling(v as SubBilling)}>
+                {(["monthly", "annual"] as SubBilling[]).map((period) => (
+                  <label key={period} className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-secondary transition-colors">
+                    <RadioGroupItem value={period} />
+                    <p className="font-medium capitalize">{period}</p>
+                  </label>
+                ))}
+              </RadioGroup>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingSub(null)}>Cancel</Button>
+            <Button onClick={handleSaveSub} disabled={savingSub}>
+              {savingSub ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </DialogContent>
