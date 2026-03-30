@@ -179,6 +179,32 @@ export default function AdminUsers() {
     }
   };
 
+  const handleEditSub = (user: UserWithRoles) => {
+    setEditingSub(user);
+    setSelectedPlan((user.subscription_plan as SubPlan) || "free");
+    setSelectedBilling((user.subscription_billing as SubBilling) || "monthly");
+  };
+
+  const handleSaveSub = async () => {
+    if (!editingSub) return;
+    setSavingSub(true);
+    try {
+      const { error } = await supabase
+        .from("subscriptions")
+        .update({ plan: selectedPlan, billing_period: selectedBilling })
+        .eq("user_id", editingSub.id);
+      if (error) throw error;
+      toast.success("Subscription updated successfully");
+      setEditingSub(null);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+      toast.error("Failed to update subscription");
+    } finally {
+      setSavingSub(false);
+    }
+  };
+
   const filteredUsers = users.filter(
     (user) =>
       user.full_name?.toLowerCase().includes(search.toLowerCase()) ||
