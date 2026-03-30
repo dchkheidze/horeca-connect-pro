@@ -72,7 +72,7 @@ export default function AdminContent() {
     excerpt: "",
     content: "",
     status: "DRAFT" as PostStatus,
-    category: "",
+    category: "none",
     read_time: 5,
     is_featured: false,
     tags: "",
@@ -123,7 +123,7 @@ export default function AdminContent() {
       excerpt: "",
       content: "",
       status: "DRAFT",
-      category: "",
+      category: "none",
       read_time: 5,
       is_featured: false,
       tags: "",
@@ -139,7 +139,7 @@ export default function AdminContent() {
       excerpt: post.excerpt || "",
       content: post.content || "",
       status: post.status as PostStatus,
-      category: post.category || "",
+      category: post.category || "none",
       read_time: post.read_time || 5,
       is_featured: post.is_featured || false,
       tags: (post.tags || []).join(", "),
@@ -164,7 +164,7 @@ export default function AdminContent() {
         status: formData.status,
         published_at: formData.status === "PUBLISHED" ? new Date().toISOString() : null,
         author_id: user?.id,
-        category: formData.category || null,
+        category: formData.category === "none" ? null : formData.category || null,
         read_time: formData.read_time,
         is_featured: formData.is_featured,
         tags: formData.tags
@@ -401,7 +401,7 @@ export default function AdminContent() {
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {knowledgeCategories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.slug}>
                         {cat.name}
