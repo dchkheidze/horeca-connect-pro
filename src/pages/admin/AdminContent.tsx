@@ -210,6 +210,7 @@ export default function AdminContent() {
         tags: formData.tags
           ? formData.tags.split(",").map((t) => t.trim()).filter(Boolean)
           : [],
+        cover_image: formData.cover_image || null,
       };
 
       if (editingPost) {
