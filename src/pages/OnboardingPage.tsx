@@ -145,6 +145,7 @@ export default function OnboardingPage() {
     supplier: "Supplier",
     serviceprovider: "Service Provider",
     jobseeker: "Job Seeker",
+    realestate: "Real Estate Agent",
   };
 
   return (
