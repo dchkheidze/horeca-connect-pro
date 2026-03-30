@@ -10,7 +10,8 @@ import {
   Menu,
   Package,
   Wrench,
-  FileText
+  FileText,
+  Home
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
