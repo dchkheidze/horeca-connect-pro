@@ -150,7 +150,7 @@ export default function AdminModeration() {
       </div>
 
       <Tabs defaultValue="restaurants">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="restaurants" className="gap-2">
             <Building2 className="h-4 w-4" />
             Restaurants ({restaurants.length})
@@ -162,6 +162,10 @@ export default function AdminModeration() {
           <TabsTrigger value="jobs" className="gap-2">
             <Briefcase className="h-4 w-4" />
             Jobs ({jobs.length})
+          </TabsTrigger>
+          <TabsTrigger value="properties" className="gap-2">
+            <Home className="h-4 w-4" />
+            Properties ({properties.length})
           </TabsTrigger>
         </TabsList>
 

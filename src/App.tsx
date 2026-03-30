@@ -166,6 +166,20 @@ const App = () => (
               <Route path="settings" element={<div className="p-4">Settings - Coming Soon</div>} />
             </Route>
 
+            {/* Real Estate dashboard routes (protected) */}
+            <Route
+              path="/re"
+              element={
+                <ProtectedRoute allowedRoles={["realestate"]}>
+                  <DashboardLayout role="realestate" />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="dashboard" element={<RealEstateDashboard />} />
+              <Route path="listings" element={<RealEstateListings />} />
+              <Route path="settings" element={<RealEstateProfileEdit />} />
+            </Route>
+
             {/* Admin routes (protected - admin only) */}
             <Route
               path="/admin"
