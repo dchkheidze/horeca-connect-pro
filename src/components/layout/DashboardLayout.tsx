@@ -17,7 +17,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardLayoutProps {
-  role: "restaurant" | "supplier" | "jobseeker" | "serviceprovider";
+  role: "restaurant" | "supplier" | "jobseeker" | "serviceprovider" | "realestate";
 }
 
 const roleConfig = {
