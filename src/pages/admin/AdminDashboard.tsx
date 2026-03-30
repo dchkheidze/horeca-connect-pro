@@ -18,6 +18,7 @@ export default function AdminDashboard() {
     totalSuppliers: 0,
     totalJobs: 0,
     totalApplications: 0,
+    totalProperties: 0,
     newUsersLast7Days: 0,
   });
   const [loading, setLoading] = useState(true);
