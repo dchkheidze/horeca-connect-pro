@@ -401,7 +401,7 @@ export default function AdminContent() {
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {knowledgeCategories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.slug}>
                         {cat.name}
