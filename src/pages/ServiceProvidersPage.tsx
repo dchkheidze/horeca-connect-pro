@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, MapPin, Wrench, ArrowRight, Loader2 } from "lucide-react";
+import { UNSPLASH, pickImage } from "@/lib/unsplash";
 
 interface ServiceProvider {
   id: string;

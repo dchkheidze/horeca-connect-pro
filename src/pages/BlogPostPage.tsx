@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowLeft } from "lucide-react";
+import { UNSPLASH, pickImage } from "@/lib/unsplash";
 import { format } from "date-fns";
 
 interface Post {

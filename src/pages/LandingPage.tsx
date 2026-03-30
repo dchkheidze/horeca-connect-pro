@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Building2, Truck, Briefcase, ArrowRight, CheckCircle2, Star } from "lucide-react";
+import { UNSPLASH } from "@/lib/unsplash";
 
 const roleCards = [
   {
@@ -12,6 +13,7 @@ const roleCards = [
     cta: "Get started as a Restaurant",
     href: "/auth/register?role=restaurant",
     color: "bg-primary",
+    image: UNSPLASH.restaurant,
   },
   {
     icon: Truck,
@@ -21,6 +23,7 @@ const roleCards = [
     cta: "Join as a Supplier",
     href: "/auth/register?role=supplier",
     color: "bg-supplier",
+    image: UNSPLASH.supplier,
   },
   {
     icon: Briefcase,
@@ -30,6 +33,7 @@ const roleCards = [
     cta: "Find Your Next Role",
     href: "/auth/register?role=jobseeker",
     color: "bg-jobseeker",
+    image: UNSPLASH.jobseeker,
   },
 ];
 
@@ -44,8 +48,16 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative overflow-hidden hero-gradient py-20 lg:py-32">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+      <section className="relative overflow-hidden py-20 lg:py-32">
+        <div className="absolute inset-0">
+          <img
+            src={UNSPLASH.hero}
+            alt="Elegant restaurant interior"
+            className="h-full w-full object-cover"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-primary/80" />
+        </div>
         
         <div className="container relative">
           <div className="mx-auto max-w-3xl text-center">
@@ -105,8 +117,16 @@ export default function LandingPage() {
                 className="group relative overflow-hidden border-border/50 bg-card hover:border-primary/30 hover:shadow-xl transition-all duration-300 animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
+                <div className="h-40 overflow-hidden">
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
                 <CardContent className="p-6">
-                  <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${card.color} mb-6`}>
+                  <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${card.color} mb-6 -mt-12 relative z-10 shadow-lg`}>
                     <card.icon className="h-7 w-7 text-primary-foreground" />
                   </div>
                   
@@ -170,23 +190,26 @@ export default function LandingPage() {
             </div>
 
             <div className="relative">
-              <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 p-8">
-                <div className="h-full rounded-xl bg-card shadow-2xl p-6 flex flex-col justify-center">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Star className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">Trusted by 50,000+ businesses</p>
-                      <p className="text-sm text-muted-foreground">Across the hospitality industry</p>
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src={UNSPLASH.featured}
+                  alt="Fine dining experience"
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <div className="rounded-xl bg-card/90 backdrop-blur-sm p-4 shadow-lg">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Star className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-semibold">Trusted by 50,000+ businesses</p>
+                        <p className="text-sm text-muted-foreground">Across the hospitality industry</p>
+                      </div>
                     </div>
                   </div>
-                  
-                  <blockquote className="text-lg italic text-muted-foreground border-l-4 border-primary pl-4">
-                    "HoReCa Hub transformed how we source suppliers. The verified network 
-                    saved us countless hours of vetting."
-                  </blockquote>
-                  <p className="mt-4 text-sm font-medium">— Sarah Chen, Restaurant Owner</p>
                 </div>
               </div>
             </div>
