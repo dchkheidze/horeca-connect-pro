@@ -1,83 +1,28 @@
 
 
-# Knowledge Center — Implementation Plan
+# Fix Post Creation Bug & Clarify Knowledge Center Content Flow
 
-## Overview
-Build a structured Knowledge Center that replaces/supplements the existing Blog with a professional, Notion-style knowledge system. This is a significant feature with multiple new pages, a new database table for categories, and enhanced article structure.
+## Problem
+The "New Post" dialog in admin Content Management freezes because the Category dropdown has `<SelectItem value="">None</SelectItem>` — Radix UI Select does not support empty string values, causing the component to break silently.
 
-## Scope Review of the Prompt
+## Fix
 
-The prompt is well-structured and feasible. Here are my notes:
+### 1. Fix Category Select (`src/pages/admin/AdminContent.tsx`)
+- Change `<SelectItem value="">None</SelectItem>` to `<SelectItem value="none">None</SelectItem>`
+- Update `handleSave` to treat `"none"` as null when saving to the database
+- Update `openEditDialog` to map null category to `"none"`
+- Initialize `formData.category` default to `"none"` instead of `""`
 
-**Fully implementable now:**
-- Knowledge Center landing page with category grid, featured articles, popular topic chips, latest articles list, and CTA section
-- Category page (filtered article list)
-- Enhanced article page with sidebar (related articles, marketplace links)
-- Search bar with filtering
-- All UI/layout requirements (Notion + Stripe Docs style, rounded cards, soft shadows, etc.)
+### 2. How Knowledge Center Content Works (No code change needed)
+The Knowledge Center pages pull from the same `posts` table that the admin manages:
+- **Admin creates posts** via Admin Panel → Content Management → "New Post"
+- **Assign a category** from the Knowledge Categories dropdown (e.g., "Operations & Management")
+- **Set status to PUBLISHED** to make it visible
+- **Mark as Featured** to show in the "Featured Insights" section on the Knowledge Center landing page
+- **Add tags** to enable filtering via "Popular Topics" chips
 
-**Adjustments needed:**
-- **Multi-language (EN/GEO/RU)**: This is a major feature on its own (i18n framework, translated content storage, language switcher). I recommend building the Knowledge Center first in English, then adding multi-language as a follow-up phase.
-- **AI recommendations**: Noted as "future" in the prompt — will prepare structure but not implement now.
-- **SEO optimization**: Can set up page titles/meta tags; full SSR-based SEO isn't possible with the current Vite SPA setup.
+The Knowledge Center hub (`/knowledge`) queries `posts` grouped by `knowledge_categories`. Category pages (`/knowledge/:slug`) filter posts by that category. Article pages (`/knowledge/:cat/:article`) display the full post with a sidebar.
 
-## Database Changes
-
-### 1. New table: `knowledge_categories`
-Stores the 10 predefined categories with icon names, descriptions, and sort order.
-
-### 2. Modify `posts` table
-Add columns:
-- `category` (text) — links to a knowledge category slug
-- `read_time` (integer) — estimated read time in minutes
-- `is_featured` (boolean, default false) — marks featured articles
-- `tags` (text array) — for popular topic filtering
-
-## New Pages & Routes
-
-| Route | Page | Description |
-|-------|------|-------------|
-| `/knowledge` | KnowledgeCenterPage | Main landing with category grid, featured, popular topics, latest, CTA |
-| `/knowledge/:categorySlug` | KnowledgeCategoryPage | Category page with filtered article list and sort options |
-| `/knowledge/:categorySlug/:articleSlug` | KnowledgeArticlePage | Article with sidebar (related articles, marketplace links) |
-
-## Page Breakdown
-
-### KnowledgeCenterPage
-1. **Header**: Title, subtitle, search bar with category chip filters
-2. **Category Grid**: 3-column grid of category cards (icon, title, description, article count) — "Coming soon" badge for empty categories
-3. **Featured Insights**: 3-4 large cards for featured articles with images, excerpt, category tag, read time
-4. **Popular Topics**: Clickable tag chips that filter content
-5. **Latest Articles**: Compact list format (title, category, excerpt, date)
-6. **CTA Block**: "Browse Marketplace" linking to `/suppliers`
-
-### KnowledgeCategoryPage
-- Category header with description and article count
-- Article list with sort options (popular, newest, guides/case studies)
-
-### KnowledgeArticlePage
-- Article content with structured headings
-- Sidebar: related articles, links to suppliers/service providers directory
-
-## Navigation
-- Replace "Blog" nav link with "Knowledge Center" pointing to `/knowledge`
-- Keep existing `/blog` routes working (redirect or keep as-is)
-
-## Files to Create/Edit
-- **Create**: `src/pages/KnowledgeCenterPage.tsx`, `src/pages/KnowledgeCategoryPage.tsx`, `src/pages/KnowledgeArticlePage.tsx`
-- **Edit**: `src/App.tsx` (add routes), `src/components/layout/PublicNav.tsx` (update nav link)
-- **Create**: Migration for `knowledge_categories` table and `posts` table additions
-- **Edit**: Admin content page to support new fields (category, read_time, featured, tags)
-
-## Design Style
-- White background with light grey sections
-- Minimal color usage (primary brand color only)
-- Rounded cards with soft shadows
-- Clean typography using existing Outfit/DM Sans fonts
-- Line icons from Lucide
-
-## What I Recommend Deferring
-- **Multi-language support** — build as a separate phase after the Knowledge Center structure is solid
-- **AI recommendations** — structural prep only
-- **Full SEO** — limited by SPA architecture; will add document titles
+## Files to Edit
+- `src/pages/admin/AdminContent.tsx` — fix the empty-value Select bug
 
