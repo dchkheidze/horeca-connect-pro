@@ -8,6 +8,7 @@ interface DashboardStats {
   totalSuppliers: number;
   totalJobs: number;
   totalApplications: number;
+  totalProperties: number;
   newUsersLast7Days: number;
 }
 
