@@ -25,6 +25,9 @@ import JobDetailPage from "@/pages/JobDetailPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
 import PricingPage from "@/pages/PricingPage";
+import KnowledgeCenterPage from "@/pages/KnowledgeCenterPage";
+import KnowledgeCategoryPage from "@/pages/KnowledgeCategoryPage";
+import KnowledgeArticlePage from "@/pages/KnowledgeArticlePage";
 
 // Auth Pages
 import LoginPage from "@/pages/auth/LoginPage";
