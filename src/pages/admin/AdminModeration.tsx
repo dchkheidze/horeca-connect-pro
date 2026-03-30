@@ -25,6 +25,7 @@ export default function AdminModeration() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
