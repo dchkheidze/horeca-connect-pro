@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 const PROPERTY_TYPES = ["restaurant", "cafe", "hotel", "bakery", "other"];
 const LISTING_TYPES = ["SALE", "RENT"];

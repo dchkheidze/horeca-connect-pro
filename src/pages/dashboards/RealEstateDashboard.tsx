@@ -81,8 +81,14 @@ export default function RealEstateDashboard() {
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Button asChild>
-            <Link to="/re/listings">
+            <Link to="/re/listings?new=1">
               <Plus className="h-4 w-4 mr-2" />
+              Add New Listing
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/re/listings">
+              <Building2 className="h-4 w-4 mr-2" />
               Manage Listings
             </Link>
           </Button>
