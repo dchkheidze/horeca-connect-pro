@@ -452,6 +452,7 @@ export default function AdminContent() {
                 Featured article
               </Label>
             </div>
+          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
