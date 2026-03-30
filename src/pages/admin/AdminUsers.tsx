@@ -59,6 +59,10 @@ export default function AdminUsers() {
   const [editingUser, setEditingUser] = useState<UserWithRoles | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
   const [saving, setSaving] = useState(false);
+  const [editingSub, setEditingSub] = useState<UserWithRoles | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<SubPlan>("free");
+  const [selectedBilling, setSelectedBilling] = useState<SubBilling>("monthly");
+  const [savingSub, setSavingSub] = useState(false);
 
   const fetchUsers = async () => {
     try {
