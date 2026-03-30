@@ -79,13 +79,14 @@ export default function AdminContent() {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const [postsRes, catsRes] = await Promise.all([
+        supabase.from("posts").select("*").order("created_at", { ascending: false }),
+        supabase.from("knowledge_categories").select("id, name, slug").order("sort_order"),
+      ]);
 
-      if (error) throw error;
-      setPosts(data || []);
+      if (postsRes.error) throw postsRes.error;
+      setPosts(postsRes.data || []);
+      setKnowledgeCategories((catsRes.data || []) as KnowledgeCategory[]);
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast.error("Failed to load posts");
