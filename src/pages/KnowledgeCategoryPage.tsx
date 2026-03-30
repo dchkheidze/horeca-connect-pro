@@ -19,6 +19,7 @@ interface Post {
   tags: string[] | null;
   published_at: string | null;
   created_at: string;
+  cover_image: string | null;
 }
 
 interface KnowledgeCategory {
