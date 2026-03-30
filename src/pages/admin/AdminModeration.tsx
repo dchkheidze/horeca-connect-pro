@@ -40,6 +40,7 @@ export default function AdminModeration() {
       if (restaurantsRes.data) setRestaurants(restaurantsRes.data);
       if (suppliersRes.data) setSuppliers(suppliersRes.data);
       if (jobsRes.data) setJobs(jobsRes.data);
+      if (propertiesRes.data) setProperties(propertiesRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to load moderation data");
