@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Building2, Truck, Briefcase, ExternalLink } from "lucide-react";
+import { Building2, Truck, Briefcase, ExternalLink, Home } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type Restaurant = Database["public"]["Tables"]["restaurants"]["Row"];
