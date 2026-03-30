@@ -31,12 +31,14 @@ export default function AdminDashboard() {
           suppliersResult,
           jobsResult,
           applicationsResult,
+          propertiesResult,
           usersResult,
         ] = await Promise.all([
           supabase.from("restaurants").select("id", { count: "exact", head: true }),
           supabase.from("suppliers").select("id", { count: "exact", head: true }),
           supabase.from("jobs").select("id", { count: "exact", head: true }),
           supabase.from("job_applications").select("id", { count: "exact", head: true }),
+          supabase.from("properties").select("id", { count: "exact", head: true }),
           supabase
             .from("profiles")
             .select("id", { count: "exact", head: true })
