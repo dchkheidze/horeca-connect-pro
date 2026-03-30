@@ -50,6 +50,7 @@ export default function AdminDashboard() {
           totalSuppliers: suppliersResult.count || 0,
           totalJobs: jobsResult.count || 0,
           totalApplications: applicationsResult.count || 0,
+          totalProperties: propertiesResult.count || 0,
           newUsersLast7Days: usersResult.count || 0,
         });
       } catch (error) {
