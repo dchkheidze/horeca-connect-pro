@@ -61,6 +61,7 @@ const emptyForm = {
 
 export default function RealEstateListings() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
