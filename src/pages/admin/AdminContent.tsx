@@ -71,6 +71,10 @@ export default function AdminContent() {
     excerpt: "",
     content: "",
     status: "DRAFT" as PostStatus,
+    category: "",
+    read_time: 5,
+    is_featured: false,
+    tags: "",
   });
 
   const fetchPosts = async () => {
