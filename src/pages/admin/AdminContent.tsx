@@ -164,7 +164,7 @@ export default function AdminContent() {
         status: formData.status,
         published_at: formData.status === "PUBLISHED" ? new Date().toISOString() : null,
         author_id: user?.id,
-        category: formData.category || null,
+        category: formData.category === "none" ? null : formData.category || null,
         read_time: formData.read_time,
         is_featured: formData.is_featured,
         tags: formData.tags
