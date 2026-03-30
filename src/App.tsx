@@ -92,6 +92,8 @@ const App = () => (
               <Route path="/knowledge" element={<KnowledgeCenterPage />} />
               <Route path="/knowledge/:categorySlug" element={<KnowledgeCategoryPage />} />
               <Route path="/knowledge/:categorySlug/:articleSlug" element={<KnowledgeArticlePage />} />
+              <Route path="/properties" element={<PropertiesPage />} />
+              <Route path="/properties/:slug" element={<PropertyDetailPage />} />
             </Route>
 
             {/* Auth routes (no layout) */}
