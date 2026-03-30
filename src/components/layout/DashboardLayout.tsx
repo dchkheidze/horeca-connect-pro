@@ -69,6 +69,16 @@ const roleConfig = {
       { icon: Settings, label: "Settings", href: "/j/settings" },
     ],
   },
+  realestate: {
+    title: "Real Estate Portal",
+    prefix: "/re",
+    color: "bg-amber-600",
+    navItems: [
+      { icon: LayoutDashboard, label: "Dashboard", href: "/re/dashboard" },
+      { icon: Home, label: "Listings", href: "/re/listings" },
+      { icon: Settings, label: "Settings", href: "/re/settings" },
+    ],
+  },
 };
 
 export function DashboardLayout({ role }: DashboardLayoutProps) {

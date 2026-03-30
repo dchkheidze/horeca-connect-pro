@@ -27,6 +27,7 @@ export function PublicNav() {
       supplier: "/s/dashboard",
       serviceprovider: "/sp/dashboard",
       jobseeker: "/j/dashboard",
+      realestate: "/re/dashboard",
     };
     return roleLinks[role] || "/dashboard";
   };
