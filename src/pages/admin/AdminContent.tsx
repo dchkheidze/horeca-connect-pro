@@ -131,6 +131,7 @@ export default function AdminContent() {
       read_time: 5,
       is_featured: false,
       tags: "",
+      cover_image: "",
     });
     setDialogOpen(true);
   };
@@ -147,8 +148,43 @@ export default function AdminContent() {
       read_time: post.read_time || 5,
       is_featured: post.is_featured || false,
       tags: (post.tags || []).join(", "),
+      cover_image: post.cover_image || "",
     });
     setDialogOpen(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const filePath = `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("post-images")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("post-images")
+        .getPublicUrl(filePath);
+
+      setFormData((prev) => ({ ...prev, cover_image: urlData.publicUrl }));
+      toast.success("Image uploaded");
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(error.message || "Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async () => {
