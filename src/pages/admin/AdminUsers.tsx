@@ -308,14 +308,24 @@ export default function AdminUsers() {
                       {new Date(user.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditRoles(user)}
-                      >
-                        <UserCog className="h-4 w-4 mr-1" />
-                        Edit Roles
-                      </Button>
+                      <div className="flex gap-1 justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditRoles(user)}
+                        >
+                          <UserCog className="h-4 w-4 mr-1" />
+                          Roles
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditSub(user)}
+                        >
+                          <CreditCard className="h-4 w-4 mr-1" />
+                          Sub
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
