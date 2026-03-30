@@ -138,6 +138,10 @@ export default function AdminContent() {
       excerpt: post.excerpt || "",
       content: post.content || "",
       status: post.status as PostStatus,
+      category: post.category || "",
+      read_time: post.read_time || 5,
+      is_featured: post.is_featured || false,
+      tags: (post.tags || []).join(", "),
     });
     setDialogOpen(true);
   };
