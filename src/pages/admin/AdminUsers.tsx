@@ -74,6 +74,7 @@ export default function AdminUsers() {
 
       if (profilesRes.error) throw profilesRes.error;
       if (rolesRes.error) throw rolesRes.error;
+      if (subsRes.error) throw subsRes.error;
 
       const rolesByUser = (rolesRes.data || []).reduce((acc, { user_id, role }) => {
         if (!acc[user_id]) acc[user_id] = [];
