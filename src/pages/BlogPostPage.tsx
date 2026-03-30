@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowLeft } from "lucide-react";
+import { UNSPLASH, pickImage } from "@/lib/unsplash";
 import { format } from "date-fns";
 
 interface Post {
@@ -72,6 +73,15 @@ export default function BlogPostPage() {
         <Button asChild variant="ghost" size="sm" className="mb-6">
           <Link to="/blog"><ArrowLeft className="mr-2 h-4 w-4" />Back to Blog</Link>
         </Button>
+
+        <div className="aspect-[21/9] overflow-hidden rounded-xl mb-8">
+          <img
+            src={pickImage(UNSPLASH.blog, post.id)}
+            alt={post.title}
+            className="h-full w-full object-cover"
+            loading="eager"
+          />
+        </div>
 
         <h1 className="font-heading text-3xl font-bold md:text-4xl">{post.title}</h1>
 
