@@ -413,6 +413,64 @@ export default function AdminModeration() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="properties" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Property Listings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-12 animate-pulse bg-muted rounded" />
+                  ))}
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Listing</TableHead>
+                      <TableHead>City</TableHead>
+                      <TableHead>Published</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {properties.map((p: any) => (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-medium">{p.title}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">{p.property_type}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={p.listing_type === "SALE" ? "default" : "secondary"}>
+                            {p.listing_type === "SALE" ? "For Sale" : "For Rent"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{p.city || "-"}</TableCell>
+                        <TableCell>
+                          <Switch
+                            checked={p.is_published || false}
+                            onCheckedChange={() => togglePropertyPublished(p.id, p.is_published || false)}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {properties.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8">
+                          <p className="text-muted-foreground">No properties found</p>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
