@@ -74,6 +74,7 @@ export default function AdminUsers() {
 
       if (profilesRes.error) throw profilesRes.error;
       if (rolesRes.error) throw rolesRes.error;
+      if (subsRes.error) throw subsRes.error;
 
       const rolesByUser = (rolesRes.data || []).reduce((acc, { user_id, role }) => {
         if (!acc[user_id]) acc[user_id] = [];
@@ -191,8 +192,10 @@ export default function AdminUsers() {
     try {
       const { error } = await supabase
         .from("subscriptions")
-        .update({ plan: selectedPlan, billing_period: selectedBilling })
-        .eq("user_id", editingSub.id);
+        .upsert(
+          { user_id: editingSub.id, plan: selectedPlan, billing_period: selectedBilling },
+          { onConflict: "user_id" }
+        );
       if (error) throw error;
       toast.success("Subscription updated successfully");
       setEditingSub(null);
