@@ -19,6 +19,7 @@ interface Post {
   tags: string[] | null;
   published_at: string | null;
   created_at: string;
+  cover_image: string | null;
 }
 
 interface KnowledgeCategory {
@@ -148,7 +149,7 @@ export default function KnowledgeArticlePage() {
           {/* Hero image */}
           <div className="aspect-[16/9] overflow-hidden rounded-xl mb-8">
             <img
-              src={pickImage(UNSPLASH.blog, post.id)}
+              src={post.cover_image || pickImage(UNSPLASH.blog, post.id)}
               alt={post.title}
               className="h-full w-full object-cover"
             />

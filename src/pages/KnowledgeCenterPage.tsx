@@ -45,6 +45,7 @@ interface Post {
   published_at: string | null;
   created_at: string;
   status: string;
+  cover_image: string | null;
 }
 
 export default function KnowledgeCenterPage() {
@@ -189,7 +190,7 @@ export default function KnowledgeCenterPage() {
                   <Card className="h-full overflow-hidden transition-shadow hover:shadow-lg group">
                     <div className="aspect-[16/9] overflow-hidden">
                       <img
-                        src={pickImage(UNSPLASH.blog, post.id)}
+                        src={post.cover_image || pickImage(UNSPLASH.blog, post.id)}
                         alt={post.title}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"

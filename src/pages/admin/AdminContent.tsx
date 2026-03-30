@@ -29,8 +29,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, FileText } from "lucide-react";
+import { Plus, Pencil, Trash2, FileText, Upload, Link2, X, Image } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Post {
@@ -47,6 +48,7 @@ interface Post {
   read_time: number | null;
   is_featured: boolean | null;
   tags: string[] | null;
+  cover_image: string | null;
 }
 
 interface KnowledgeCategory {
@@ -76,7 +78,9 @@ export default function AdminContent() {
     read_time: 5,
     is_featured: false,
     tags: "",
+    cover_image: "",
   });
+  const [uploading, setUploading] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -127,6 +131,7 @@ export default function AdminContent() {
       read_time: 5,
       is_featured: false,
       tags: "",
+      cover_image: "",
     });
     setDialogOpen(true);
   };
@@ -143,8 +148,43 @@ export default function AdminContent() {
       read_time: post.read_time || 5,
       is_featured: post.is_featured || false,
       tags: (post.tags || []).join(", "),
+      cover_image: post.cover_image || "",
     });
     setDialogOpen(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const filePath = `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("post-images")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("post-images")
+        .getPublicUrl(filePath);
+
+      setFormData((prev) => ({ ...prev, cover_image: urlData.publicUrl }));
+      toast.success("Image uploaded");
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(error.message || "Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -170,6 +210,7 @@ export default function AdminContent() {
         tags: formData.tags
           ? formData.tags.split(",").map((t) => t.trim()).filter(Boolean)
           : [],
+        cover_image: formData.cover_image || null,
       };
 
       if (editingPost) {
@@ -437,6 +478,65 @@ export default function AdminContent() {
                 placeholder="e.g. Food Cost, Hiring, Marketing"
               />
             </div>
+            {/* Cover Image */}
+            <div className="space-y-2">
+              <Label>Cover Image</Label>
+              {formData.cover_image && (
+                <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden border bg-muted mb-2">
+                  <img
+                    src={formData.cover_image}
+                    alt="Cover preview"
+                    className="h-full w-full object-cover"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-7 w-7"
+                    onClick={() => setFormData((prev) => ({ ...prev, cover_image: "" }))}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <Tabs defaultValue="upload" className="w-full">
+                <TabsList className="w-full">
+                  <TabsTrigger value="upload" className="flex-1">
+                    <Upload className="h-4 w-4 mr-1" /> Upload
+                  </TabsTrigger>
+                  <TabsTrigger value="url" className="flex-1">
+                    <Link2 className="h-4 w-4 mr-1" /> URL
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="upload">
+                  <div className="flex items-center gap-2">
+                    <label className="flex-1 cursor-pointer">
+                      <div className="flex items-center justify-center gap-2 p-3 border-2 border-dashed rounded-lg text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                        <Image className="h-4 w-4" />
+                        {uploading ? "Uploading..." : "Click to select image"}
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                        disabled={uploading}
+                      />
+                    </label>
+                  </div>
+                </TabsContent>
+                <TabsContent value="url">
+                  <Input
+                    placeholder="https://example.com/image.jpg"
+                    value={formData.cover_image}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, cover_image: e.target.value }))
+                    }
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
+
             <div className="flex items-center gap-2">
               <Checkbox
                 id="is_featured"

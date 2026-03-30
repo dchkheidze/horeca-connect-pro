@@ -16,6 +16,7 @@ interface Post {
   published_at: string | null;
   created_at: string;
   status: string;
+  cover_image: string | null;
 }
 
 export default function BlogPostPage() {
@@ -76,7 +77,7 @@ export default function BlogPostPage() {
 
         <div className="aspect-[21/9] overflow-hidden rounded-xl mb-8">
           <img
-            src={pickImage(UNSPLASH.blog, post.id)}
+            src={post.cover_image || pickImage(UNSPLASH.blog, post.id)}
             alt={post.title}
             className="h-full w-full object-cover"
             loading="eager"

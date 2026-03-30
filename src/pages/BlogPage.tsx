@@ -16,6 +16,7 @@ interface Post {
   published_at: string | null;
   created_at: string;
   status: string;
+  cover_image: string | null;
 }
 
 export default function BlogPage() {
@@ -75,7 +76,7 @@ export default function BlogPage() {
               <Card className="h-full transition-shadow hover:shadow-lg overflow-hidden">
                 <div className="aspect-[16/9] overflow-hidden">
                   <img
-                    src={pickImage(UNSPLASH.blog, post.id)}
+                    src={post.cover_image || pickImage(UNSPLASH.blog, post.id)}
                     alt={post.title}
                     className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                     loading="lazy"
