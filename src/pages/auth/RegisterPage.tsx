@@ -188,6 +188,7 @@ export default function RegisterPage() {
                     <SelectItem value="serviceprovider">{roleOptionLabels.serviceprovider}</SelectItem>
                     <SelectItem value="supplier_serviceprovider">{roleOptionLabels.supplier_serviceprovider}</SelectItem>
                     <SelectItem value="jobseeker">{roleOptionLabels.jobseeker}</SelectItem>
+                    <SelectItem value="realestate">{roleOptionLabels.realestate}</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.roleOption && <p className="text-sm text-destructive">{errors.roleOption}</p>}

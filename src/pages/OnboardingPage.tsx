@@ -185,6 +185,10 @@ export default function OnboardingPage() {
             onComplete={handleStepComplete}
           />
         )}
+
+        {currentRole === "realestate" && (
+          <RealEstateOnboarding userId={user.id} onComplete={handleStepComplete} />
+        )}
       </div>
     </div>
   );
