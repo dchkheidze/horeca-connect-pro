@@ -25,6 +25,7 @@ const roleOptionLabels: Record<RoleOption, string> = {
   serviceprovider: "Service provider",
   supplier_serviceprovider: "Supplier & Service provider",
   jobseeker: "Job seeker",
+  realestate: "Real estate agent",
 };
 
 function roleOptionToRoles(option: RoleOption): AppRole[] {
