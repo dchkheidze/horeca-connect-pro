@@ -52,6 +52,11 @@ import ServiceProviderRFQs from "@/pages/serviceprovider/ServiceProviderRFQs";
 import JobSeekerDashboard from "@/pages/dashboards/JobSeekerDashboard";
 import JobSeekerProfile from "@/pages/jobseeker/JobSeekerProfile";
 import JobSeekerApplications from "@/pages/jobseeker/JobSeekerApplications";
+import RealEstateDashboard from "@/pages/dashboards/RealEstateDashboard";
+import RealEstateListings from "@/pages/realestate/RealEstateListings";
+import RealEstateProfileEdit from "@/pages/realestate/RealEstateProfileEdit";
+import PropertiesPage from "@/pages/PropertiesPage";
+import PropertyDetailPage from "@/pages/PropertyDetailPage";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/AdminDashboard";
