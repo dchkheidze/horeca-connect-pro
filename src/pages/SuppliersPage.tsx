@@ -122,8 +122,13 @@ export default function SuppliersPage() {
                 key={supplier.id}
                 className="group overflow-hidden border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300"
               >
-                <div className="aspect-[2/1] overflow-hidden bg-muted flex items-center justify-center">
-                  <Building2 className="h-12 w-12 text-muted-foreground/50" />
+                <div className="aspect-[2/1] overflow-hidden bg-muted">
+                  <img
+                    src={pickImage(UNSPLASH.directory, supplier.id)}
+                    alt={supplier.name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
                 </div>
 
                 <CardContent className="p-5">

@@ -72,9 +72,16 @@ export default function BlogPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
             <Link key={post.id} to={`/blog/${post.slug}`}>
-              <Card className="h-full transition-shadow hover:shadow-lg">
+              <Card className="h-full transition-shadow hover:shadow-lg overflow-hidden">
+                <div className="aspect-[16/9] overflow-hidden">
+                  <img
+                    src={pickImage(UNSPLASH.blog, post.id)}
+                    alt={post.title}
+                    className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
                 <CardHeader>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                     <Calendar className="h-3.5 w-3.5" />
                     {post.published_at
                       ? format(new Date(post.published_at), "MMM d, yyyy")
