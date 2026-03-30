@@ -1,28 +1,38 @@
 
 
-# Fix Post Creation Bug & Clarify Knowledge Center Content Flow
+# Add Image Support to Articles (URL + Upload)
 
-## Problem
-The "New Post" dialog in admin Content Management freezes because the Category dropdown has `<SelectItem value="">None</SelectItem>` — Radix UI Select does not support empty string values, causing the component to break silently.
+## Overview
+Add a `cover_image` field to posts so admins can either paste an image URL or upload an image file. Articles without a custom image will continue using the current Unsplash fallback.
 
-## Fix
+## Changes
 
-### 1. Fix Category Select (`src/pages/admin/AdminContent.tsx`)
-- Change `<SelectItem value="">None</SelectItem>` to `<SelectItem value="none">None</SelectItem>`
-- Update `handleSave` to treat `"none"` as null when saving to the database
-- Update `openEditDialog` to map null category to `"none"`
-- Initialize `formData.category` default to `"none"` instead of `""`
+### 1. Database Migration
+- Add `cover_image` (text, nullable) column to `posts` table
+- Create a `post-images` storage bucket (public) with RLS policies allowing admin uploads
 
-### 2. How Knowledge Center Content Works (No code change needed)
-The Knowledge Center pages pull from the same `posts` table that the admin manages:
-- **Admin creates posts** via Admin Panel → Content Management → "New Post"
-- **Assign a category** from the Knowledge Categories dropdown (e.g., "Operations & Management")
-- **Set status to PUBLISHED** to make it visible
-- **Mark as Featured** to show in the "Featured Insights" section on the Knowledge Center landing page
-- **Add tags** to enable filtering via "Popular Topics" chips
+### 2. Admin Post Editor (`src/pages/admin/AdminContent.tsx`)
+- Add a "Cover Image" section in the create/edit dialog with:
+  - Tab toggle: "URL" | "Upload"
+  - URL tab: text input for pasting any image URL
+  - Upload tab: file input with drag-and-drop, uploads to `post-images` bucket
+  - Image preview thumbnail when a URL or uploaded image is set
+  - Clear button to remove the image
+- Save `cover_image` URL to the `posts` table
 
-The Knowledge Center hub (`/knowledge`) queries `posts` grouped by `knowledge_categories`. Category pages (`/knowledge/:slug`) filter posts by that category. Article pages (`/knowledge/:cat/:article`) display the full post with a sidebar.
+### 3. Update Display Pages
+- **BlogPage.tsx**: Use `post.cover_image || pickImage(UNSPLASH.blog, post.id)` for thumbnails
+- **BlogPostPage.tsx**: Same fallback logic for hero image
+- **KnowledgeCenterPage.tsx**: Same for featured article cards
+- **KnowledgeCategoryPage.tsx**: Same for category article cards
+- **KnowledgeArticlePage.tsx**: Same for article hero image
 
 ## Files to Edit
-- `src/pages/admin/AdminContent.tsx` — fix the empty-value Select bug
+- **Migration**: Add `cover_image` column + storage bucket
+- `src/pages/admin/AdminContent.tsx` — image input UI
+- `src/pages/BlogPage.tsx` — use cover_image with fallback
+- `src/pages/BlogPostPage.tsx` — use cover_image with fallback
+- `src/pages/KnowledgeCenterPage.tsx` — use cover_image with fallback
+- `src/pages/KnowledgeCategoryPage.tsx` — use cover_image with fallback
+- `src/pages/KnowledgeArticlePage.tsx` — use cover_image with fallback
 
