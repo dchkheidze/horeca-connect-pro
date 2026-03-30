@@ -78,7 +78,9 @@ export default function AdminContent() {
     read_time: 5,
     is_featured: false,
     tags: "",
+    cover_image: "",
   });
+  const [uploading, setUploading] = useState(false);
 
   const fetchPosts = async () => {
     try {
