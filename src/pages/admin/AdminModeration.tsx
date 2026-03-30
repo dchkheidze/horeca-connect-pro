@@ -30,10 +30,11 @@ export default function AdminModeration() {
 
   const fetchData = async () => {
     try {
-      const [restaurantsRes, suppliersRes, jobsRes] = await Promise.all([
+      const [restaurantsRes, suppliersRes, jobsRes, propertiesRes] = await Promise.all([
         supabase.from("restaurants").select("*").order("created_at", { ascending: false }),
         supabase.from("suppliers").select("*").order("created_at", { ascending: false }),
         supabase.from("jobs").select("*").order("created_at", { ascending: false }),
+        supabase.from("properties").select("*").order("created_at", { ascending: false }),
       ]);
 
       if (restaurantsRes.data) setRestaurants(restaurantsRes.data);
