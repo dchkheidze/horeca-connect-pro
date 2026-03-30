@@ -95,6 +95,7 @@ export default function OnboardingPage() {
           supplier: "/s/dashboard",
           serviceprovider: "/sp/dashboard",
           jobseeker: "/j/dashboard",
+          realestate: "/re/dashboard",
         };
         navigate(roleRedirects[primaryRole] || "/dashboard", { replace: true });
         return;
