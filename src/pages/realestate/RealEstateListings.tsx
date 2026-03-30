@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 const PROPERTY_TYPES = ["restaurant", "cafe", "hotel", "bakery", "other"];
 const LISTING_TYPES = ["SALE", "RENT"];
@@ -60,6 +61,7 @@ const emptyForm = {
 
 export default function RealEstateListings() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -83,6 +85,12 @@ export default function RealEstateListings() {
     fetchProperties();
   }, [user]);
 
+  useEffect(() => {
+    if (searchParams.get("new") === "1" && !loading) {
+      openCreate();
+      setSearchParams({}, { replace: true });
+    }
+  }, [loading, searchParams]);
   const generateSlug = (title: string) =>
     title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
