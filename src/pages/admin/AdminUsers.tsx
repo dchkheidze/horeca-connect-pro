@@ -328,6 +328,7 @@ export default function AdminUsers() {
                       {role === "supplier" && "Can manage supplier profile and offers"}
                       {role === "serviceprovider" && "Can manage service provider profile and offers"}
                       {role === "jobseeker" && "Can apply for jobs"}
+                      {role === "realestate" && "Can manage property listings"}
                     </p>
                   </div>
                 </label>

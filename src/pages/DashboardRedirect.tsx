@@ -56,6 +56,7 @@ export default function DashboardRedirect() {
         supplier: "/s/dashboard",
         serviceprovider: "/sp/dashboard",
         jobseeker: "/j/dashboard",
+        realestate: "/re/dashboard",
         admin: "/admin/dashboard",
       };
       navigate(roleRedirects[role] || "/dashboard", { replace: true });

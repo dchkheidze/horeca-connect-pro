@@ -11,6 +11,7 @@ const ROLE_DASHBOARDS: Record<string, string> = {
   supplier: "/s/dashboard",
   serviceprovider: "/sp/dashboard",
   jobseeker: "/j/dashboard",
+  realestate: "/re/dashboard",
   admin: "/admin/dashboard",
 };
 
