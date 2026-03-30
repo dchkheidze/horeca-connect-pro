@@ -16,6 +16,7 @@ interface Post {
   published_at: string | null;
   created_at: string;
   status: string;
+  cover_image: string | null;
 }
 
 export default function BlogPage() {
