@@ -122,6 +122,10 @@ export default function AdminContent() {
       excerpt: "",
       content: "",
       status: "DRAFT",
+      category: "",
+      read_time: 5,
+      is_featured: false,
+      tags: "",
     });
     setDialogOpen(true);
   };
