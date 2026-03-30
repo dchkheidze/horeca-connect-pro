@@ -191,8 +191,10 @@ export default function AdminUsers() {
     try {
       const { error } = await supabase
         .from("subscriptions")
-        .update({ plan: selectedPlan, billing_period: selectedBilling })
-        .eq("user_id", editingSub.id);
+        .upsert(
+          { user_id: editingSub.id, plan: selectedPlan, billing_period: selectedBilling },
+          { onConflict: "user_id" }
+        );
       if (error) throw error;
       toast.success("Subscription updated successfully");
       setEditingSub(null);
