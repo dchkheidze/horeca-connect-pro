@@ -99,6 +99,13 @@ export default function AdminDashboard() {
       color: "text-green-600",
       bgColor: "bg-green-100",
     },
+    {
+      title: "Properties",
+      value: stats.totalProperties,
+      icon: Home,
+      color: "text-amber-600",
+      bgColor: "bg-amber-100",
+    },
   ];
 
   return (
