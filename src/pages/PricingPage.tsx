@@ -26,8 +26,8 @@ const plans = [
     id: "standard" as const,
     name: "Standard",
     description: "For growing businesses ready to scale",
-    monthlyPrice: 104, // 90 * 1.15 rounded
-    annualPrice: 90,
+    monthlyPrice: 90,
+    annualPrice: 918, // 90 * 12 * 0.85
     features: [
       "Everything in Free",
       "Unlimited listings",
@@ -42,8 +42,8 @@ const plans = [
     id: "premium" as const,
     name: "Premium",
     description: "Full access for established businesses",
-    monthlyPrice: 173, // 150 * 1.15 rounded
-    annualPrice: 150,
+    monthlyPrice: 150,
+    annualPrice: 1530, // 150 * 12 * 0.85
     features: [
       "Everything in Standard",
       "Featured business badge",
