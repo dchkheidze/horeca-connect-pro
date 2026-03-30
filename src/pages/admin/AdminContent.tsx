@@ -72,7 +72,7 @@ export default function AdminContent() {
     excerpt: "",
     content: "",
     status: "DRAFT" as PostStatus,
-    category: "",
+    category: "none",
     read_time: 5,
     is_featured: false,
     tags: "",
