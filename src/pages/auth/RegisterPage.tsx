@@ -10,7 +10,7 @@ import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
-type RoleOption = "restaurant" | "supplier" | "serviceprovider" | "supplier_serviceprovider" | "jobseeker";
+type RoleOption = "restaurant" | "supplier" | "serviceprovider" | "supplier_serviceprovider" | "jobseeker" | "realestate";
 
 const registerSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
