@@ -330,6 +330,105 @@ export type Database = {
         }
         Relationships: []
       }
+      properties: {
+        Row: {
+          address: string | null
+          area_sqm: number | null
+          city: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          cover_image: string | null
+          created_at: string
+          currency: string | null
+          description: string | null
+          id: string
+          images: string[] | null
+          is_published: boolean | null
+          listing_type: string
+          owner_user_id: string
+          price: number | null
+          property_type: string
+          slug: string
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          area_sqm?: number | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_image?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_published?: boolean | null
+          listing_type: string
+          owner_user_id: string
+          price?: number | null
+          property_type: string
+          slug: string
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          area_sqm?: number | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_image?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_published?: boolean | null
+          listing_type?: string
+          owner_user_id?: string
+          price?: number | null
+          property_type?: string
+          slug?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      real_estate_agents: {
+        Row: {
+          city: string | null
+          company_name: string
+          created_at: string
+          id: string
+          owner_user_id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          company_name: string
+          created_at?: string
+          id?: string
+          owner_user_id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          company_name?: string
+          created_at?: string
+          id?: string
+          owner_user_id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       restaurants: {
         Row: {
           address: string | null
@@ -750,6 +849,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -766,6 +866,7 @@ export type Database = {
         | "jobseeker"
         | "admin"
         | "serviceprovider"
+        | "realestate"
       application_status:
         | "APPLIED"
         | "SHORTLISTED"
@@ -913,6 +1014,7 @@ export const Constants = {
         "jobseeker",
         "admin",
         "serviceprovider",
+        "realestate",
       ],
       application_status: [
         "APPLIED",
