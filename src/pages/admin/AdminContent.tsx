@@ -59,6 +59,7 @@ type PostStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 export default function AdminContent() {
   const { user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [knowledgeCategories, setKnowledgeCategories] = useState<KnowledgeCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
