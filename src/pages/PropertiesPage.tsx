@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { Building2, MapPin, Maximize, Search, Lock } from "lucide-react";
+import { Building2, MapPin, Maximize, Search } from "lucide-react";
 
 interface Property {
   id: string;
@@ -20,79 +18,33 @@ interface Property {
   area_sqm: number | null;
   city: string | null;
   cover_image: string | null;
-  is_published: boolean | null;
-  status: string | null;
 }
 
 export default function PropertiesPage() {
-  const { user } = useAuth();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
-  const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
   const [search, setSearch] = useState("");
   const [listingFilter, setListingFilter] = useState("ALL");
   const [typeFilter, setTypeFilter] = useState("ALL");
 
   useEffect(() => {
     const load = async () => {
-      if (!user) {
-        setHasSubscription(false);
-        setLoading(false);
-        return;
-      }
-
-      // Check subscription
-      const { data: sub } = await supabase
-        .from("subscriptions")
-        .select("plan")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      const hasSub = sub?.plan === "standard" || sub?.plan === "premium";
-      setHasSubscription(hasSub);
-
-      if (hasSub) {
-        const { data } = await supabase
-          .from("properties")
-          .select("id, title, slug, listing_type, property_type, price, currency, area_sqm, city, cover_image, is_published, status")
-          .eq("is_published", true)
-          .eq("status", "ACTIVE")
-          .order("created_at", { ascending: false });
-        setProperties((data as Property[]) || []);
-      }
+      const { data } = await supabase
+        .from("properties")
+        .select("id, title, slug, listing_type, property_type, price, currency, area_sqm, city, cover_image")
+        .eq("is_published", true)
+        .eq("status", "ACTIVE")
+        .order("created_at", { ascending: false });
+      setProperties((data as Property[]) || []);
       setLoading(false);
     };
     load();
-  }, [user]);
-
-  if (!user) {
-    return (
-      <div className="container py-16 text-center">
-        <Lock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Sign in required</h1>
-        <p className="text-muted-foreground mb-6">You need to be signed in to browse property listings.</p>
-        <Button asChild><Link to="/auth/login">Sign in</Link></Button>
-      </div>
-    );
-  }
+  }, []);
 
   if (loading) {
     return (
       <div className="container py-16">
         <div className="animate-pulse text-muted-foreground text-center">Loading properties...</div>
-      </div>
-    );
-  }
-
-  if (!hasSubscription) {
-    return (
-      <div className="container py-16 text-center">
-        <Lock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Upgrade Required</h1>
-        <p className="text-muted-foreground mb-6">
-          Property listings are available for Standard and Premium subscribers.
-        </p>
-        <Button asChild><Link to="/pricing">View Pricing Plans</Link></Button>
       </div>
     );
   }

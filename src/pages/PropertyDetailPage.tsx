@@ -4,8 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { ArrowLeft, Building2, MapPin, Maximize, Phone, Mail, Lock } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Maximize, Phone, Mail } from "lucide-react";
 
 interface Property {
   id: string;
@@ -29,56 +28,25 @@ interface Property {
 
 export default function PropertyDetailPage() {
   const { slug } = useParams();
-  const { user } = useAuth();
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hasSubscription, setHasSubscription] = useState(false);
 
   useEffect(() => {
     const load = async () => {
-      if (!user) { setLoading(false); return; }
-
-      const { data: sub } = await supabase.from("subscriptions").select("plan").eq("user_id", user.id).maybeSingle();
-      const hasSub = sub?.plan === "standard" || sub?.plan === "premium";
-      setHasSubscription(hasSub);
-
-      if (hasSub) {
-        const { data } = await supabase
-          .from("properties")
-          .select("*")
-          .eq("slug", slug)
-          .eq("is_published", true)
-          .maybeSingle();
-        setProperty(data as Property | null);
-      }
+      const { data } = await supabase
+        .from("properties")
+        .select("*")
+        .eq("slug", slug)
+        .eq("is_published", true)
+        .maybeSingle();
+      setProperty(data as Property | null);
       setLoading(false);
     };
     load();
-  }, [slug, user]);
-
-  if (!user) {
-    return (
-      <div className="container py-16 text-center">
-        <Lock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Sign in required</h1>
-        <Button asChild><Link to="/auth/login">Sign in</Link></Button>
-      </div>
-    );
-  }
+  }, [slug]);
 
   if (loading) {
     return <div className="container py-16 text-center"><div className="animate-pulse text-muted-foreground">Loading...</div></div>;
-  }
-
-  if (!hasSubscription) {
-    return (
-      <div className="container py-16 text-center">
-        <Lock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Upgrade Required</h1>
-        <p className="text-muted-foreground mb-6">Property details are available for Standard and Premium subscribers.</p>
-        <Button asChild><Link to="/pricing">View Pricing Plans</Link></Button>
-      </div>
-    );
   }
 
   if (!property) {
