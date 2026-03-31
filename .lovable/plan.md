@@ -1,31 +1,23 @@
 
 
-# Add "New Listing" Button to Real Estate Dashboard
+# Fix: Admin Cannot Upsert Subscriptions
 
 ## Problem
-The Real Estate Dashboard (`src/pages/dashboards/RealEstateDashboard.tsx`) has a "Manage Listings" button but no direct "Add New Listing" button. Agents need a quick way to create a new property.
+The `subscriptions` table RLS policies don't allow admins to INSERT rows for other users. The upsert operation needs both INSERT and UPDATE permissions. Currently:
+- ✅ "Admins can update all subscriptions" — UPDATE works
+- ❌ No "Admins can insert subscriptions" — INSERT fails when no row exists
 
-## Fix — `src/pages/dashboards/RealEstateDashboard.tsx`
+## Fix — Database Migration
 
-In the Quick Actions card (line ~89), add a "New Listing" button that opens the listings page. Since the create dialog lives in `RealEstateListings.tsx`, the simplest approach is to link to `/re/listings` with a query param `?new=1` and update `RealEstateListings.tsx` to auto-open the create dialog when that param is present.
+Add an RLS policy allowing admins to insert subscriptions:
 
-### Changes:
-1. **`src/pages/dashboards/RealEstateDashboard.tsx`** — Add a prominent "Add New Listing" button in Quick Actions:
-   ```tsx
-   <Button asChild>
-     <Link to="/re/listings?new=1">
-       <Plus className="h-4 w-4 mr-2" /> Add New Listing
-     </Link>
-   </Button>
-   ```
+```sql
+CREATE POLICY "Admins can insert all subscriptions"
+ON public.subscriptions
+FOR INSERT
+TO authenticated
+WITH CHECK (is_admin(auth.uid()));
+```
 
-2. **`src/pages/realestate/RealEstateListings.tsx`** — Read `?new=1` from URL search params and auto-open the create dialog on mount:
-   ```tsx
-   const [searchParams] = useSearchParams();
-   useEffect(() => {
-     if (searchParams.get("new") === "1") openCreate();
-   }, []);
-   ```
-
-Two files, minimal changes.
+Single migration, no code changes needed.
 
