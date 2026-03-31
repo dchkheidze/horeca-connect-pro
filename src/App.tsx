@@ -102,6 +102,16 @@ const App = () => (
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/dashboard" element={<DashboardRedirect />} />
 
+            {/* My properties — any authenticated user */}
+            <Route
+              path="/my-properties"
+              element={
+                <ProtectedRoute allowedRoles={["restaurant", "supplier", "jobseeker", "serviceprovider", "realestate"]}>
+                  <RealEstateListings />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Restaurant dashboard routes (protected) */}
             <Route
               path="/r"
