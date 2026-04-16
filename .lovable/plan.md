@@ -1,31 +1,34 @@
 
-The user has two Supabase projects referenced in their codebase:
 
-1. **`.env` / config** → project ref `uuguukpjjsupbjidoyde` (URL: `https://uuguukpjjsupbjidoyde.supabase.co`)
-2. **`src/integrations/supabase/client.ts`** → project ref `usebdeoflkfzefwqutla` (URL: `https://usebdeoflkfzefwqutla.supabase.co`)
+# Plan: Re-point Supabase Client to Shared Database
 
-These are **two completely different Supabase projects**. The app code (client.ts) is hardcoded to talk to `usebdeoflkfzefwqutla`, while Lovable Cloud manages `uuguukpjjsupbjidoyde`. That's why earlier the TS error appeared and why behavior may seem inconsistent — your app is actually pointing at a *different* database than the one Lovable Cloud (and all the migrations we've been writing) is managing.
+## What We're Doing
+Switching this project's backend connection from `uuguukpjjsupbjidoyde` to the shared fork.ge (RestGo) database at `whxpzfafivwcmhqtfbvy`.
 
-This is a research/diagnosis question, not an implementation task — so a plain answer is appropriate. But since fixing it requires editing the auto-generated client file (which is normally off-limits) and re-syncing, I'll lay out a short remediation plan.
+## Important Caveat
+- **`.env` is auto-managed** by Lovable Cloud and cannot be manually edited. The Lovable Cloud integration for this project is permanently bound to `uuguukpjjsupbjidoyde`. Editing `.env` would be overwritten.
+- **`src/integrations/supabase/client.ts`** is also auto-generated, but we can override its hardcoded values to point to the shared DB.
 
-# Answer: No — they are two different databases
+## Steps
 
-| Source | Project ref | URL |
-|---|---|---|
-| Lovable Cloud (`.env`, migrations, RLS we've been editing) | `uuguukpjjsupbjidoyde` | `https://uuguukpjjsupbjidoyde.supabase.co` |
-| Hardcoded in `src/integrations/supabase/client.ts` | `usebdeoflkfzefwqutla` | `https://usebdeoflkfzefwqutla.supabase.co` |
+### 1. Update `src/integrations/supabase/client.ts`
+Hardcode the URL and anon key to the shared database:
+- URL: `https://whxpzfafivwcmhqtfbvy.supabase.co`
+- Anon key: the key you provided
 
-Your **frontend is talking to `usebdeoflkfzefwqutla`**, but every database change, RLS policy, and migration we've made (subscriptions fix, properties RLS, etc.) has been applied to **`uuguukpjjsupbjidoyde`** — the Lovable Cloud project.
+### 2. Update `src/integrations/supabase/types.ts`
+Replace the current types file with types matching the shared database schema (restaurants with Google Places columns, neighborhoods, restaurant_cuisines, offers, reviews, events, bookmarks, post_likes, post_comments, etc.). This will require querying or manually defining the schema based on the shared DB's actual structure.
 
-That mismatch is almost certainly why some fixes didn't take effect as expected.
+Since I cannot run migrations or introspect the remote DB directly from this project, I'll need either:
+- A copy of the types from the RestGo project, or
+- To manually construct the types based on your schema description.
 
-# Recommended Fix
+I can pull the types from the RestGo project using cross-project tools if available.
 
-Re-sync the Supabase client to point at the Lovable Cloud project (`uuguukpjjsupbjidoyde`) so the frontend, migrations, and RLS all live on the same database.
+### 3. No Migrations
+No database changes — schema already exists on the shared DB.
 
-**Steps:**
-1. Update `src/integrations/supabase/client.ts` to use the Lovable Cloud URL + anon key from `.env` (`uuguukpjjsupbjidoyde.supabase.co` and the matching publishable key).
-2. Verify `src/integrations/supabase/types.ts` matches the Lovable Cloud schema (it should already, since migrations target that project).
-3. Test login + a property/subscription action to confirm everything reads from the correct DB.
+## Risk
+- Lovable Cloud may regenerate `client.ts` and overwrite our changes. If that happens, the override will need to be re-applied.
+- RLS policies on the shared DB may differ from what this project expects — some features may need adjustment.
 
-**Heads-up:** Any user accounts, properties, or data created against `usebdeoflkfzefwqutla` will not appear after the switch — they live in the other database. If you need that data, it has to be exported and re-imported into the Lovable Cloud project.
