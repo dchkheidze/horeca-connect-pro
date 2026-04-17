@@ -1,29 +1,22 @@
 
 
-User asks who can publish a restaurant (toggle `is_published`). Let me check RLS policies on `restaurants` table from the context already provided.
+User asks if there's an admin user for this site. Quick read-only DB check — query `user_roles` joined with `profiles` for role='admin'.
 
-From `<supabase-tables>` → `restaurants` → RLS policies:
+# Plan: Check for Admin Users
 
-**UPDATE policies on `restaurants`:**
-1. `Admins can update all restaurants` — `USING: is_admin(auth.uid())`
-2. `Owners can update their restaurant` — `USING: auth.uid() = owner_user_id`
+Run a single query against the connected DB:
 
-Both can toggle `is_published` since it's just a column update. No column-level restriction exists.
+```sql
+SELECT p.user_id, p.full_name, ur.created_at
+FROM user_roles ur
+LEFT JOIN profiles p ON p.user_id = ur.user_id
+WHERE ur.role = 'admin';
+```
 
-**UI surfaces for publishing:**
-- Owner: `src/pages/restaurant/RestaurantProfileEdit.tsx` — "Visibility" card with `Switch` bound to `is_published`, saved via `restaurants.update(...)` filtered by `id` (owner RLS allows it)
-- Admin: `src/pages/admin/AdminModeration.tsx` — `toggleRestaurantPublished(id, currentStatus)` updates `restaurants.is_published` (admin RLS allows it)
+Report back:
+- How many admin users exist
+- Their names / user IDs / when the role was granted
+- If none exist, recommend next step (promote an existing user via SQL, since there's no self-serve admin signup)
 
-# Publishing Permissions for Restaurants
-
-**Yes, both can publish.** Confirmed by RLS policies on the `restaurants` table:
-
-| Who | Policy | Where in app |
-|---|---|---|
-| Restaurant owner | `Owners can update their restaurant` (`auth.uid() = owner_user_id`) | Dashboard → Profile → "Visibility" toggle (`RestaurantProfileEdit.tsx`) |
-| Admin | `Admins can update all restaurants` (`is_admin(auth.uid())`) | Admin → Moderation → publish switch on restaurants tab (`AdminModeration.tsx`) |
-
-Same pattern applies to `suppliers`, `service_providers`, `properties` — owners publish their own, admins publish anyone's.
-
-**Note on "Good Restaurant":** It's currently `is_published = false`. Either the owner logs in and flips the visibility switch on their profile, or an admin flips it from the Moderation page. No code changes needed — both paths already exist and work.
+No code changes. Approve and I'll run it.
 
