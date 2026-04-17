@@ -1,38 +1,63 @@
 
 
-User can't sign in as admin. The admin role row exists in `user_roles` (user_id `f1df0fc5...`) but the auth credentials may not work — likely because the `auth.users` row for that user_id doesn't exist anymore (DB merge could have wiped auth.users while leaving public schema intact), or the password is unknown.
+User reset password but didn't get email. Need to check why. Most likely cause: no email domain configured, so Lovable's default sender is being used — but maybe it's failing or going to spam. Let me check status.
+<lov-tool-use id="toolu_vrtx_01HS9GCHusdaSMZDqeAn6mgP" name="email_domain--check_email_domain_status" integration-id="email_domain" data="">
+</lov-tool-use>
 
-Let me think through what I can verify vs. what needs action:
+<lov-tool-use id="toolu_vrtx_01Hun5QJUWCypfYWwTD2WoRf" name="supabase--analytics_query" integration-id="supabase" data="{\"query\": \"select id, auth_logs.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from auth_logs cross join unnest(metadata) as metadata where metadata.path like '%recover%' or event_message ilike '%recover%' or event_message ilike '%reset%' or event_message ilike '%mail%' order by timestamp desc limit 50\"}">
+</lov-tool-use>
 
-**Verifiable now (read-only):**
-- Whether `auth.users` contains the admin user_id `f1df0fc5...`
-- The admin's email (from auth.users)
+<lov-tool-use id="toolu_vrtx_01UQrq4dxdDWWSQWEWVM2wTB" name="email_domain--check_email_domain_status" integration-id="email_domain" data="{\"domain\": \"\"}">
+</lov-tool-use>
 
-**Not fixable in read-only mode:**
-- Resetting the password (requires admin API / SQL)
-- Creating a new admin user (requires signup + role insert migration)
+<lov-tool-use id="toolu_vrtx_01EGzKnYS1fHJXCgboAuTqfS" name="supabase--analytics_query" integration-id="supabase" data="{\"query\": \"select id, auth_logs.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from auth_logs cross join unnest(metadata) as metadata where event_message ilike '%recover%' or event_message ilike '%reset%' or event_message ilike '%mail%' order by timestamp desc limit 50\"}">
+</lov-tool-use>
 
-# Plan: Restore Admin Access
+<lov-tool-use id="toolu_vrtx_01KjM7SaCeSxvmZ5bqRH5trQ" name="supabase--analytics_query" integration-id="supabase" data="{\"query\": \"select id, auth_logs.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from auth_logs cross join unnest(metadata) as metadata order by timestamp desc limit 30\"}">
+</lov-tool-use>
+<lov-plan>
 
-## Step 1 — Diagnose (read-only, immediate)
-Query `auth.users` to check whether the admin user (`f1df0fc5...`) still exists and what email it uses. Three possible outcomes:
+User reset password via the new "Forgot password" form but didn't receive the email.
 
-| Finding | Meaning | Fix |
-|---|---|---|
-| User exists, email known | Password forgotten/changed | Send password reset OR set new password via admin API |
-| User row missing | DB merge wiped auth user but left role | Create new admin: sign up via UI, then promote via SQL |
-| User exists but email unknown to you | Need to confirm with you | Show email so you can request reset |
+**Diagnosis:**
+- No email domain configured in this project (confirmed via domain check).
+- Auth logs returned empty — request may not have hit the server, OR Supabase is sending via the default Lovable mailer but it's not being delivered to this address.
+- Default auth emails (no custom domain) go through Lovable's built-in sender. They sometimes:
+  - Land in spam/promotions
+  - Get throttled (built-in limits ~2/hour per recipient)
+  - Get suppressed if a previous bounce occurred
 
-## Step 2 — Restore access (requires switch to default mode)
-Based on what Step 1 finds, do one of:
+**Most likely causes (in order):**
+1. Email is in spam folder (default sender is unfamiliar to mail providers).
+2. Rate-limit hit — Supabase free tier limits password reset to ~2/hour per email.
+3. The address `dchkheidze@gmail.com` previously bounced/marked spam → suppressed.
+4. The reset request never actually fired (form bug).
 
-- **A) Reset password for existing admin**: Use Supabase admin API (in a one-off edge function or migration) to set a known temporary password — you log in and change it.
-- **B) Recreate admin from scratch**: You sign up normally with any email through `/auth/register` (pick any role). I then add an `admin` row in `user_roles` for your new `user_id` via migration. You'll have admin access on next login.
-- **C) Promote an existing user**: If you already have another working account, I add an `admin` role row for that user_id via migration.
+# Plan: Fix Missing Reset Email
 
-Option **B** is the safest and fastest if the original admin's auth row is gone.
+## Step 1 — Quick verifications (no code)
+Ask the user to:
+- Check **Spam / Promotions** folder for sender `noreply@mail.app.supabase.io` or similar
+- Wait 2–3 min and try again (in case of brief delay)
+- Confirm they typed `dchkheidze@gmail.com` exactly on the Forgot Password page
 
-## What I need from you
-1. Approve so I can run the diagnostic query.
-2. After I report findings, tell me your preferred fix path (A/B/C) and provide the email you want to use as admin.
+## Step 2 — If still missing: set up branded email domain (RECOMMENDED)
+Default mailer has poor deliverability and tight rate limits. The proper fix is to configure a sender domain so reset emails ship from the project's own domain reliably.
+
+This requires the user to:
+- Open the email setup dialog
+- Add a domain (or subdomain like `notify.<theirdomain>`)
+- Add NS records at their registrar
+- Wait for DNS verification
+
+After domain is verified, I'll scaffold branded auth email templates and deploy the auth-email-hook so password reset, signup confirmation, and magic-link emails all come from their brand.
+
+## Step 3 — Immediate workaround (if user can't set up a domain right now)
+Re-use the existing `admin-reset-password` edge function to set a known temporary password directly. They log in and change it from inside the app. This bypasses email entirely.
+
+## What I need from the user
+Pick one:
+- **A)** I checked spam — still nothing. **Set up a custom email domain** so emails work properly going forward.
+- **B)** Just **reset my password directly again** via the admin function — I'll deal with email later.
+- **C)** It was in spam / it arrived now — no action needed, but please **delete the temporary admin-reset-password function** since the flow works.
 
