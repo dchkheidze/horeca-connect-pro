@@ -32,6 +32,8 @@ import KnowledgeArticlePage from "@/pages/KnowledgeArticlePage";
 // Auth Pages
 import LoginPage from "@/pages/auth/LoginPage";
 import RegisterPage from "@/pages/auth/RegisterPage";
+import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/auth/ResetPasswordPage";
 import OnboardingPage from "@/pages/OnboardingPage";
 import DashboardRedirect from "@/pages/DashboardRedirect";
 
@@ -99,6 +101,8 @@ const App = () => (
             {/* Auth routes (no layout) */}
             <Route path="/auth/login" element={<LoginPage />} />
             <Route path="/auth/register" element={<RegisterPage />} />
+            <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/dashboard" element={<DashboardRedirect />} />
 
