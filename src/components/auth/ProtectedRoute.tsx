@@ -31,6 +31,11 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
+  // If no role restrictions, any authenticated user is allowed
+  if (!allowedRoles || allowedRoles.length === 0) {
+    return <>{children}</>;
+  }
+
   if (!role) {
     return <Navigate to="/onboarding" replace />;
   }
@@ -40,7 +45,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   }
 
   // Check if user has ANY of the allowed roles
-  if (allowedRoles && !allowedRoles.some((r) => roles.includes(r))) {
+  if (!allowedRoles.some((r) => roles.includes(r))) {
     return <Navigate to={ROLE_DASHBOARDS[role] || "/dashboard"} replace />;
   }
 

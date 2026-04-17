@@ -35,6 +35,7 @@ import RegisterPage from "@/pages/auth/RegisterPage";
 import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/auth/ResetPasswordPage";
 import OnboardingPage from "@/pages/OnboardingPage";
+import ChangePasswordPage from "@/pages/auth/ChangePasswordPage";
 import DashboardRedirect from "@/pages/DashboardRedirect";
 
 // Dashboard Pages
@@ -105,6 +106,14 @@ const App = () => (
             <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/dashboard" element={<DashboardRedirect />} />
+            <Route
+              path="/account/password"
+              element={
+                <ProtectedRoute>
+                  <ChangePasswordPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* My properties — any authenticated user */}
             <Route
