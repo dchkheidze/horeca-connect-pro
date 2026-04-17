@@ -75,6 +75,9 @@ export function PublicNav() {
               <Button variant="ghost" asChild>
                 <Link to={getDashboardLink()}>Dashboard</Link>
               </Button>
+              <Button variant="ghost" asChild>
+                <Link to="/account/password">Change password</Link>
+              </Button>
               <Button variant="outline" onClick={handleSignOut}>
                 Sign out
               </Button>
@@ -136,6 +139,13 @@ export function PublicNav() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Dashboard
+                </Link>
+                <Link
+                  to="/account/password"
+                  className="px-4 py-3 text-sm font-medium hover:bg-secondary rounded-lg"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Change password
                 </Link>
                 <Button variant="outline" onClick={handleSignOut} className="mt-2">
                   Sign out
