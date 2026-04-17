@@ -60,6 +60,8 @@ import RealEstateListings from "@/pages/realestate/RealEstateListings";
 import RealEstateProfileEdit from "@/pages/realestate/RealEstateProfileEdit";
 import PropertiesPage from "@/pages/PropertiesPage";
 import PropertyDetailPage from "@/pages/PropertyDetailPage";
+import RestaurantsPage from "@/pages/RestaurantsPage";
+import RestaurantProfilePage from "@/pages/RestaurantProfilePage";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -97,6 +99,8 @@ const App = () => (
               <Route path="/knowledge/:categorySlug/:articleSlug" element={<KnowledgeArticlePage />} />
               <Route path="/properties" element={<PropertiesPage />} />
               <Route path="/properties/:slug" element={<PropertyDetailPage />} />
+              <Route path="/restaurants" element={<RestaurantsPage />} />
+              <Route path="/restaurants/:slug" element={<RestaurantProfilePage />} />
             </Route>
 
             {/* Auth routes (no layout) */}
