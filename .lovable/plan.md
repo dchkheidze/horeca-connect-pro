@@ -1,48 +1,57 @@
 
 
-The user is asking how to change their password. Let me think about what exists and what's missing.
+User says "Good Restaurant" isn't visible on the public Restaurants directory. They're logged in as admin/restaurant owner and want to know how to publish it.
 
-**Current state:**
-- Forgot password flow exists (`/auth/forgot-password` → email link → `/auth/reset-password`)
-- No in-app "change password" page for logged-in users
-- The user is on `/` (landing) — likely asking generally
+Let me check what controls visibility and where the toggle lives.
 
-**Two interpretations:**
-1. "How do I do it right now?" → instructional answer (no code)
-2. "Build a change-password feature" → implementation
+From the codebase I already have:
+- `src/pages/restaurant/RestaurantProfileEdit.tsx` has a "Visibility" card with an `is_published` Switch — this is the owner-side publish toggle.
+- `src/pages/admin/AdminModeration.tsx` has a Restaurants tab with a publish Switch — admin-side override.
+- Public directory likely filters by `is_published = true` (standard pattern, matches the rest of the project).
 
-Given the recent thread (admin login struggles, email reset unreliable without custom domain), the user most likely wants an **in-app change password option** so they don't depend on email at all.
+Let me also confirm "Good Restaurant" exists and its current state.
+<lov-plan-actions>
+Quick check via DB to confirm the row + status.
+</lov-plan-actions>
 
-# Plan: Add in-app "Change Password" for logged-in users
+# Answer: How to publish a restaurant
 
-## What to build
-A simple settings page where any signed-in user can change their password by entering current + new password.
+This is a how-to question, not a build request. No code changes needed — the feature already exists.
 
-## Pages & routes
-- New page: `src/pages/auth/ChangePasswordPage.tsx`
-- New route: `/account/password` (wrapped in `ProtectedRoute`, no role restriction so all authenticated users can use it)
+## Two ways to make a restaurant visible
 
-## Form fields
-- Current password (re-authenticate by calling `signInWithPassword` with current email + current pw to verify)
-- New password (min 8 chars, Zod validation)
-- Confirm new password (must match)
+### Option A — As the restaurant owner
+1. Sign in as the restaurant's owner account
+2. Go to the Restaurant dashboard → **Profile** (route: `/r/profile`)
+3. At the top, find the **Visibility** card
+4. Flip the **Public Profile** switch ON (eye icon turns green)
+5. Click **Save Changes**
 
-## Logic
-1. Validate inputs with Zod (same pattern as `ResetPasswordPage`)
-2. Verify current password by re-signing in with `supabase.auth.signInWithPassword`
-3. If verified, call `supabase.auth.updateUser({ password: newPassword })`
-4. Toast success + stay on page (session remains valid)
+The restaurant will appear at `/restaurants` and be reachable at `/restaurants/<slug>`.
 
-## Entry points (so user can find it)
-- Add "Change password" link in `PublicNav`'s authenticated dropdown/menu area (next to "Sign out")
-- Optionally add it to each dashboard sidebar — but a single global header link is enough for now
+### Option B — As an admin (override)
+1. Go to **Admin → Moderation** (`/admin/moderation`)
+2. Open the **Restaurants** tab
+3. Find "Good Restaurant" in the table
+4. Toggle the **Published** switch ON
 
-## Out of scope
-- 2FA, password strength meter, session-wide logout-on-change (Supabase handles session refresh automatically)
+No save button needed — the admin toggle writes immediately.
 
-## Meanwhile — answer to "how to change password right now"
-Three existing options:
-1. **Forgot password flow** — `/auth/forgot-password`, but email delivery is unreliable until a custom sender domain is configured
-2. **Admin reset edge function** — still deployed; can set a temporary password directly (what we used for `dchkheidze@gmail.com`)
-3. **After this feature ships** — just sign in and visit `/account/password`
+## Why "Good Restaurant" isn't showing
+Almost certainly its `is_published` flag is still `false` (the default after onboarding — onboarding creates restaurants with `is_published: false`). The public `/restaurants` page filters out unpublished entries.
+
+## If toggling on still doesn't show it
+Possible secondary causes to check after publishing:
+- Restaurant has no `slug` (older rows may be missing it) — saving the profile regenerates the slug
+- Browser cache — hard refresh `/restaurants`
+- Filters applied on the directory page (city/cuisine) excluding it
+
+Tell me if it's still not visible after toggling and I'll investigate the row directly.
+
+<lov-actions>
+<lov-suggestion message="Good Restaurant is still not visible after I toggled is_published on. Please investigate the database row and the /restaurants directory query.">It's still not visible after toggling</lov-suggestion>
+<lov-suggestion message="Add a 'Publish' shortcut button directly on the Restaurant Dashboard so owners don't have to dig into Profile → Visibility to make their restaurant public.">Add quick-publish button on dashboard</lov-suggestion>
+<lov-suggestion message="Show a clear 'Your restaurant is hidden from the public directory' banner on the Restaurant Dashboard whenever is_published is false, with a one-click Publish button.">Add hidden-status banner</lov-suggestion>
+<lov-suggestion message="Delete the temporary admin-reset-password edge function now that login and in-app password change both work.">Clean up admin-reset-password function</lov-suggestion>
+</lov-actions>
 
