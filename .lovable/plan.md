@@ -1,30 +1,48 @@
 
-Root cause
 
-- This does not look like a bad password.
-- I found that the app is pointed at the wrong backend environment.
-- The current project/backend we inspected and reset passwords in is `uuguukpjjsupbjidoyde`, but the browser auth client in `src/integrations/supabase/client.ts` is hardcoded to a different project: `whxpzfafivwcmhqtfbvy`.
-- So the password reset was applied in the current backend, while the login form is checking credentials against the old backend. That exactly matches the “credentials are wrong” symptom and also explains why the reset-email logs were empty.
+The user is asking how to change their password. Let me think about what exists and what's missing.
 
-Plan
+**Current state:**
+- Forgot password flow exists (`/auth/forgot-password` → email link → `/auth/reset-password`)
+- No in-app "change password" page for logged-in users
+- The user is on `/` (landing) — likely asking generally
 
-1. Repair the backend binding
-   - Refresh/regenerate the managed backend client so the app uses the same backend as this project’s database and auth system.
-   - Do not rely on the stale hardcoded client values going forward.
+**Two interpretations:**
+1. "How do I do it right now?" → instructional answer (no code)
+2. "Build a change-password feature" → implementation
 
-2. Retest authentication end-to-end
-   - Try signing in again with the admin account using the password that was already reset.
-   - Trigger forgot-password again and confirm the request now reaches the correct backend.
+Given the recent thread (admin login struggles, email reset unreliable without custom domain), the user most likely wants an **in-app change password option** so they don't depend on email at all.
 
-3. Verify access after login
-   - Check `/dashboard` and `/admin/dashboard`.
-   - Spot-check a couple of data-driven pages, because this mismatch can affect more than auth.
+# Plan: Add in-app "Change Password" for logged-in users
 
-4. Clean up
-   - Remove the temporary admin password-reset helper once login is confirmed working.
+## What to build
+A simple settings page where any signed-in user can change their password by entering current + new password.
 
-Technical details
+## Pages & routes
+- New page: `src/pages/auth/ChangePasswordPage.tsx`
+- New route: `/account/password` (wrapped in `ProtectedRoute`, no role restriction so all authenticated users can use it)
 
-- `.env` points to the current backend: `uuguukpjjsupbjidoyde`
-- `src/integrations/supabase/client.ts` points to a different backend: `whxpzfafivwcmhqtfbvy`
-- The admin user `dchkheidze@gmail.com` does exist in the current backend and is confirmed there, so the main fix is aligning the frontend with the correct backend, not recreating the user.
+## Form fields
+- Current password (re-authenticate by calling `signInWithPassword` with current email + current pw to verify)
+- New password (min 8 chars, Zod validation)
+- Confirm new password (must match)
+
+## Logic
+1. Validate inputs with Zod (same pattern as `ResetPasswordPage`)
+2. Verify current password by re-signing in with `supabase.auth.signInWithPassword`
+3. If verified, call `supabase.auth.updateUser({ password: newPassword })`
+4. Toast success + stay on page (session remains valid)
+
+## Entry points (so user can find it)
+- Add "Change password" link in `PublicNav`'s authenticated dropdown/menu area (next to "Sign out")
+- Optionally add it to each dashboard sidebar — but a single global header link is enough for now
+
+## Out of scope
+- 2FA, password strength meter, session-wide logout-on-change (Supabase handles session refresh automatically)
+
+## Meanwhile — answer to "how to change password right now"
+Three existing options:
+1. **Forgot password flow** — `/auth/forgot-password`, but email delivery is unreliable until a custom sender domain is configured
+2. **Admin reset edge function** — still deployed; can set a temporary password directly (what we used for `dchkheidze@gmail.com`)
+3. **After this feature ships** — just sign in and visit `/account/password`
+
