@@ -1,60 +1,31 @@
+## Goal
+Translate the homepage (`/`) content to Georgian (ქართული).
 
-Root cause
+## Scope
+Only `src/pages/LandingPage.tsx` — all visible strings (hero, stats, role cards, "Why" section, CTA). Navigation header and footer are shared across the whole site and will stay in English for now (can be done as a follow-up).
 
-- The restaurant record itself is fine: “Good Restaurant” is already `is_published = true` in the database.
-- The real issue is the frontend: this project does not currently have a public restaurant directory or restaurant detail route.
-- I confirmed:
-  - `App.tsx` has routes for `/suppliers`, `/service-providers`, `/jobs`, `/properties`, but no `/restaurants`.
-  - There is no `RestaurantsPage` or `RestaurantDetailPage` component.
-  - Admin Moderation links to `/restaurants/:slug`, but that route does not exist, so the preview link is effectively broken.
-- That is why the restaurant is neither visible nor searchable on Restgo even though it is published.
+## Translations (key strings)
 
-What I’ll build
+- Hero title: "The B2B Marketplace for Hospitality Professionals" → „B2B პლატფორმა სასტუმრო-რესტორნის პროფესიონალებისთვის"
+- Hero subtitle → "დააკავშირეთ რესტორნები სანდო მომწოდებლებთან, აღმოაჩინეთ საუკეთესო კადრები და გაზარდეთ თქვენი ბიზნესი HoReCa ინდუსტრიაში."
+- Buttons: "Get Started Free" → „დაიწყეთ უფასოდ"; "Browse Suppliers" → „იხილეთ მომწოდებლები"; "Browse Jobs" → „ვაკანსიების დათვალიერება"; "Create Free Account" → „შექმენით უფასო ანგარიში"
+- Stats labels: Verified Suppliers/Active Jobs/Restaurants/Satisfaction Rate → „დადასტურებული მომწოდებლები / აქტიური ვაკანსიები / რესტორნები / კმაყოფილების მაჩვენებელი"
+- Section heading "How can we help you today?" → „როგორ შეგვიძლია დაგეხმაროთ?"
+- Role cards (For Restaurants/Suppliers/Job Seekers) — titles, descriptions, feature bullets, CTAs all translated
+- "Why HoReCa Hub?" + heading + paragraph + 4 bullet items translated
+- Final CTA section heading + subtitle translated
+- Brand name "HoReCa Hub" stays as-is
 
-1. Add a public Restaurants directory
-   - New page modeled after Suppliers / Service Providers.
-   - Query published restaurants only.
-   - Add client-side search for name, description, city, and cuisine tags.
-   - Show restaurant cards with name, city, cuisine, price level, and link to the public profile.
+## Technical
+- Single-file edit: hardcode Georgian strings directly in `LandingPage.tsx` (no i18n framework added).
+- No new dependencies, no routing, no DB changes.
+- Fonts: Outfit + DM Sans both support Georgian script via Google Fonts — already loaded.
 
-2. Add a public Restaurant detail page
-   - New slug-based page at `/restaurants/:slug`.
-   - Load only published restaurants.
-   - Show full restaurant details: description, city, address, phone, website, cuisine tags, and price level.
+## Out of scope
+- Header (`PublicNav`) and `Footer` — remain English.
+- Other pages (Suppliers, Jobs, Auth, etc.) — remain English.
+- A real multi-language switcher (EN/GE/RU per project memory) — would require introducing `react-i18next`, a language context, and translating every page. Mention as a follow-up.
 
-3. Wire routing and navigation
-   - Register `/restaurants` and `/restaurants/:slug` in `App.tsx`.
-   - Add “Restaurants” to the public nav so users can actually browse them.
-   - Keep SEO-friendly slug behavior consistent with the rest of the app.
-
-4. Align existing links
-   - Ensure Admin Moderation’s existing external link now opens a real public page.
-   - Review any other places that should point to the restaurant directory/profile.
-
-5. Verify the specific case
-   - Confirm “Good Restaurant” appears in the directory.
-   - Confirm searching “Good Restaurant” returns it.
-   - Confirm `/restaurants/good-restaurant-mo1pb703` loads correctly.
-
-Technical notes
-
-- No database migration should be needed.
-- Existing RLS already allows public reads for published restaurants: `is_published = true`.
-- I’ll follow the same structure and styling patterns already used by:
-  - `SuppliersPage.tsx`
-  - `SupplierProfilePage.tsx`
-  - `ServiceProvidersPage.tsx`
-  - `ServiceProviderProfilePage.tsx`
-
-Files likely involved
-
-- `src/App.tsx`
-- `src/components/layout/PublicNav.tsx`
-- new `src/pages/RestaurantsPage.tsx`
-- new `src/pages/RestaurantProfilePage.tsx`
-
-Expected outcome
-
-- Published restaurants become visible to the public.
-- “Good Restaurant” becomes browseable and searchable on Restgo.
-- Admin preview links for restaurants stop leading to missing pages.
+## Follow-ups (optional, ask after)
+- Translate `PublicNav` + `Footer` so the page looks fully Georgian.
+- Add a proper i18n system with EN/GE/RU switcher in the header.

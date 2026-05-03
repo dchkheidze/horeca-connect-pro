@@ -7,30 +7,30 @@ import { UNSPLASH } from "@/lib/unsplash";
 const roleCards = [
   {
     icon: Building2,
-    title: "For Restaurants",
-    description: "Find trusted suppliers, post jobs, and streamline your procurement. Connect with verified vendors who understand hospitality.",
-    features: ["Access supplier marketplace", "Post job openings", "Manage vendor relationships"],
-    cta: "Get started as a Restaurant",
+    title: "რესტორნებისთვის",
+    description: "იპოვეთ სანდო მომწოდებლები, გამოაქვეყნეთ ვაკანსიები და გაამარტივეთ შესყიდვები. დაუკავშირდით დადასტურებულ პარტნიორებს, რომლებიც იცნობენ სასტუმრო-რესტორნის სფეროს.",
+    features: ["წვდომა მომწოდებლების ბაზარზე", "ვაკანსიების გამოქვეყნება", "მომწოდებლებთან ურთიერთობების მართვა"],
+    cta: "დაიწყეთ როგორც რესტორანი",
     href: "/auth/register?role=restaurant",
     color: "bg-primary",
     image: UNSPLASH.restaurant,
   },
   {
     icon: Truck,
-    title: "For Suppliers",
-    description: "Reach restaurants and hotels actively looking for your products and services. Grow your B2B customer base.",
-    features: ["List your business", "Connect with buyers", "Receive quote requests"],
-    cta: "Join as a Supplier",
+    title: "მომწოდებლებისთვის",
+    description: "მიაღწიეთ რესტორნებსა და სასტუმროებს, რომლებიც აქტიურად ეძებენ თქვენს პროდუქტებსა და მომსახურებას. გაზარდეთ თქვენი B2B კლიენტთა ბაზა.",
+    features: ["დაარეგისტრირეთ თქვენი ბიზნესი", "დაუკავშირდით მყიდველებს", "მიიღეთ ფასის მოთხოვნები"],
+    cta: "შემოგვიერთდით როგორც მომწოდებელი",
     href: "/auth/register?role=supplier",
     color: "bg-supplier",
     image: UNSPLASH.supplier,
   },
   {
     icon: Briefcase,
-    title: "For Job Seekers",
-    description: "Discover opportunities in hospitality. From executive chef positions to front-of-house roles at top establishments.",
-    features: ["Browse curated jobs", "Easy applications", "Career resources"],
-    cta: "Find Your Next Role",
+    title: "სამუშაოს მაძიებლებისთვის",
+    description: "აღმოაჩინეთ შესაძლებლობები სასტუმრო-რესტორნის სფეროში. შეფ-მზარეულის პოზიციებიდან დარბაზის მომსახურების როლებამდე საუკეთესო დაწესებულებებში.",
+    features: ["შერჩეული ვაკანსიების დათვალიერება", "მარტივი განაცხადები", "კარიერული რესურსები"],
+    cta: "იპოვეთ თქვენი შემდეგი სამუშაო",
     href: "/auth/register?role=jobseeker",
     color: "bg-jobseeker",
     image: UNSPLASH.jobseeker,
@@ -38,10 +38,10 @@ const roleCards = [
 ];
 
 const stats = [
-  { value: "2,500+", label: "Verified Suppliers" },
-  { value: "10,000+", label: "Active Jobs" },
-  { value: "50,000+", label: "Restaurants" },
-  { value: "98%", label: "Satisfaction Rate" },
+  { value: "2,500+", label: "დადასტურებული მომწოდებელი" },
+  { value: "10,000+", label: "აქტიური ვაკანსია" },
+  { value: "50,000+", label: "რესტორანი" },
+  { value: "98%", label: "კმაყოფილების მაჩვენებელი" },
 ];
 
 export default function LandingPage() {
@@ -62,22 +62,21 @@ export default function LandingPage() {
         <div className="container relative">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="font-heading text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl animate-fade-in">
-              The B2B Marketplace for
-              <span className="block mt-2">Hospitality Professionals</span>
+              B2B პლატფორმა
+              <span className="block mt-2">სასტუმრო-რესტორნის პროფესიონალებისთვის</span>
             </h1>
             <p className="mt-6 text-lg text-primary-foreground/80 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-              Connect restaurants with trusted suppliers, discover top hospitality talent, 
-              and grow your business in the HoReCa industry.
+              დააკავშირეთ რესტორნები სანდო მომწოდებლებთან, აღმოაჩინეთ საუკეთესო კადრები და გაზარდეთ თქვენი ბიზნესი HoReCa ინდუსტრიაში.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
               <Button size="xl" variant="accent" asChild>
                 <Link to="/auth/register">
-                  Get Started Free
+                  დაიწყეთ უფასოდ
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button size="xl" variant="hero-outline" asChild>
-                <Link to="/suppliers">Browse Suppliers</Link>
+                <Link to="/suppliers">იხილეთ მომწოდებლები</Link>
               </Button>
             </div>
           </div>
@@ -103,10 +102,10 @@ export default function LandingPage() {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center mb-12">
             <h2 className="font-heading text-3xl font-bold lg:text-4xl">
-              How can we help you today?
+              როგორ შეგვიძლია დაგეხმაროთ?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Choose your path and unlock the full potential of our B2B hospitality platform.
+              აირჩიეთ თქვენი გზა და გამოიყენეთ ჩვენი B2B სასტუმრო-რესტორნის პლატფორმის სრული პოტენციალი.
             </p>
           </div>
 
@@ -161,23 +160,21 @@ export default function LandingPage() {
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
             <div>
               <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-                Why HoReCa Hub?
+                რატომ HoReCa Hub?
               </span>
               <h2 className="font-heading text-3xl font-bold lg:text-4xl mb-6">
-                Built specifically for the hospitality industry
+                შექმნილია სპეციალურად სასტუმრო-რესტორნის ინდუსტრიისთვის
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Unlike generic B2B platforms, HoReCa Hub understands the unique needs of restaurants, 
-                hotels, and catering businesses. Our verified supplier network and curated job board 
-                save you time and ensure quality.
+                ზოგადი B2B პლატფორმებისგან განსხვავებით, HoReCa Hub იცნობს რესტორნების, სასტუმროებისა და კეტერინგ ბიზნესების უნიკალურ საჭიროებებს. ჩვენი დადასტურებული მომწოდებლების ქსელი და შერჩეული ვაკანსიების დაფა დაგიზოგავთ დროს და უზრუნველყოფს ხარისხს.
               </p>
 
               <div className="space-y-4">
                 {[
-                  "Verified suppliers with industry certifications",
-                  "Specialized job categories for hospitality roles",
-                  "Direct communication with decision makers",
-                  "Streamlined RFQ and ordering process",
+                  "დადასტურებული მომწოდებლები ინდუსტრიული სერთიფიკატებით",
+                  "სპეციალიზებული სამუშაო კატეგორიები სასტუმრო-რესტორნისთვის",
+                  "პირდაპირი კომუნიკაცია გადაწყვეტილების მიმღებებთან",
+                  "გამარტივებული ფასის მოთხოვნისა და შეკვეთის პროცესი",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-3">
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary">
@@ -205,8 +202,8 @@ export default function LandingPage() {
                         <Star className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <p className="font-semibold">Trusted by 50,000+ businesses</p>
-                        <p className="text-sm text-muted-foreground">Across the hospitality industry</p>
+                        <p className="font-semibold">ენდობა 50,000+ ბიზნესი</p>
+                        <p className="text-sm text-muted-foreground">სასტუმრო-რესტორნის ინდუსტრიაში</p>
                       </div>
                     </div>
                   </div>
@@ -222,21 +219,20 @@ export default function LandingPage() {
         <div className="container">
           <div className="rounded-2xl hero-gradient p-8 lg:p-12 text-center">
             <h2 className="font-heading text-3xl font-bold text-primary-foreground lg:text-4xl mb-4">
-              Ready to grow your hospitality business?
+              მზად ხართ გაზარდოთ თქვენი სასტუმრო-რესტორნის ბიზნესი?
             </h2>
             <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-              Join thousands of restaurants, suppliers, and hospitality professionals 
-              already using HoReCa Hub to connect and grow.
+              შემოუერთდით ათასობით რესტორანს, მომწოდებელსა და პროფესიონალს, რომლებიც უკვე იყენებენ HoReCa Hub-ს დასაკავშირებლად და გასაზრდელად.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button size="lg" variant="accent" asChild>
                 <Link to="/auth/register">
-                  Create Free Account
+                  შექმენით უფასო ანგარიში
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button size="lg" variant="hero-outline" asChild>
-                <Link to="/jobs">Browse Jobs</Link>
+                <Link to="/jobs">იხილეთ ვაკანსიები</Link>
               </Button>
             </div>
           </div>
